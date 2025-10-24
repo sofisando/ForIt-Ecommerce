@@ -1,0 +1,9 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,
+    "outDir": "dist",
+    "noEmit": true
+  },
+  "include": ["src/**/*.ts"], //incluye la carpeta src en la compilacion y lo mete en la carpeta dist
+}
