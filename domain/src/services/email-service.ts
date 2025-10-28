@@ -1,8 +1,11 @@
+import type { User } from "../entities";
+import type { Order, OrderState } from "../entities/order";
+
 export interface EmailService {
   sendEmail: (to: string, subject: string, body: string) => Promise<void>;
-  notifyUserRegistration: (userEmail: string) => Promise<void>;
-  notifyNewOrder: (userEmail: string, orderId: string) => Promise<void>;
-  notifyDropOrder: (userEmail: string, orderId: string) => Promise<void>;
-  notifyUpdateStateOrder: (userEmail: string, orderId: string, newState: string) => Promise<void>; //poner interfaz de order
+  notifyUserRegistration: (userEmail: User['email']) => Promise<void>;
+  notifyNewOrder: (userEmail: User['email'], orderId: Order['id']) => Promise<void>;
+  notifyDropOrder: (userEmail: User['email'], orderId: Order['id']) => Promise<void>;
+  notifyUpdateStateOrder: (userEmail: User['email'], orderId: Order['id'], newState: OrderState) => Promise<void>;
 }
 
