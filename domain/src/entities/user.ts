@@ -1,3 +1,5 @@
+import type { Entity } from "../utils/types/entity.js";
+
 export const UserRole = {
     ADMIN: "ADMIN",
     CLIENT: "CLIENT",
@@ -5,10 +7,13 @@ export const UserRole = {
 
 export type UserRole = typeof UserRole[keyof typeof UserRole];
 
-export interface User {
+export interface User extends Entity {
     id: string;
     name: string;
+    DNI: string;
     email: string;
-    password: string;
+    password: string; //en realidad hay que guardar el hash
     role: UserRole;
 }
+
+export type SecureUser = Omit<User, "password">;
