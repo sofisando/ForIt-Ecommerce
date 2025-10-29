@@ -13,6 +13,6 @@ interface ServiceStorage<TEntity extends Entity> {
   editOne: (id: string, data: Partial<TEntity>) => Promise<TEntity>;
 
   // updateMany: (data: TEntity[]) => Promise<TEntity[] | undefined>; //ver
-  create: (data: TEntity) => Promise<TEntity>;
+  create: (data: TEntity) => Promise<void>;
   delete: (id: string) => Promise<void>;
 }
