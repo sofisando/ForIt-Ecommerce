@@ -1,4 +1,4 @@
-import type { User } from "../../entities/user.js";
+import type { User, UserUpdate } from "../../entities/user.js";
 import type { UserService } from "../user-service.js";
 
 export class MockedUserService implements UserService {
@@ -8,25 +8,31 @@ export class MockedUserService implements UserService {
     this.users = users;
   }
 
-  editOne = async () => {
-    throw "error";
+  findById = async (id: string): Promise<User | undefined> => {
+    return this.users.find((user) => user.id == id);
   };
-  findAll = async () => {
+  findAll = async (): Promise<User[]> => {
     return this.users;
   };
-  findById = async () => {
-    throw "error";
+  editOne = async (id: string, updated: UserUpdate): Promise<User | null> => {
+    const index = this.users.findIndex((user) => user.id === id);
+    if (index === -1) return null;
+
+    const edited = { ...this.users[index], ...updated } as User;
+    this.users[index] = edited;
+    return edited;
   };
-  findByName = async () => {
-    throw "error";
-  };    
-  create = async (data: User) => {
+  create = async (data: User): Promise<User> => {
     this.users.push(data);
+    return data;
   };
-  findByEmail = async (email: string) => {
+  delete = async (id: string): Promise<void> => {
+    this.users = this.users.filter((u) => u.id !== id);
+  };
+  findByName = async (name: string): Promise<User | undefined> => {
+    return this.users.find((user) => user.name == name);
+  };
+  findByEmail = async (email: string): Promise<User | undefined> => {
     return this.users.find((user) => user.email == email);
   };
-  delete = async (id: string) => {
-    this.users = this.users.filter((u) => u.id !== id);
-  }
 }

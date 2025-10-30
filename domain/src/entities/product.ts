@@ -18,3 +18,5 @@ export interface Product extends Entity {
     categoryId: Category['id'];
     variants?: Variant[];
 }
+
+export type ProductUpdate = Partial<Omit<Product, "id">>;

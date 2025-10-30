@@ -10,9 +10,9 @@ interface ServiceQuery<TEntity extends Entity> {
 }
 
 interface ServiceStorage<TEntity extends Entity> {
-  editOne: (id: string, data: Partial<TEntity>) => Promise<TEntity>;
+  editOne: (id: string, data: Partial<TEntity>) => Promise<TEntity | null>;
 
   // updateMany: (data: TEntity[]) => Promise<TEntity[] | undefined>; //ver
-  create: (data: TEntity) => Promise<void>;
+  create: (data: TEntity) => Promise<TEntity>;
   delete: (id: string) => Promise<void>;
 }

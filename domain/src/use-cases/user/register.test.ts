@@ -1,6 +1,5 @@
 import { describe, expect, test } from "vitest";
-import type { UserService } from "../../services/user-service.js";
-import { UserRole, type User } from "../../entities/user.js";
+import { UserRole } from "../../entities/user.js";
 import { register } from "./register.js";
 import { MockedUserService } from "../../services/mocks/mock-user-service.js";
 import { userMock } from "../../entities/mocks/user-mock.js";
