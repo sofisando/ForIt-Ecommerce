@@ -18,17 +18,22 @@ describe("register", async () => {
   test("When registering a user you should create the user", async () => {
     const result = await register(
       { userService },
-      { name: "Sofia", email: "sofia@gmail.com", password: "User@1234", DNI: "87673527", role: UserRole.CLIENT }
+      {
+        name: "Sofia",
+        email: "sofia@gmail.com",
+        password: "User@1234",
+        DNI: "87673527",
+        role: UserRole.CLIENT,
+      }
     );
 
-    expect(result).toBeUndefined();
     expect(userService.users).toHaveLength(2);
     expect(userService.users[1]).toStrictEqual({
       id: expect.any(String),
       name: "Sofia",
       email: "sofia@gmail.com",
       password: "User@1234",
-      DNI: "87673527", 
+      DNI: "87673527",
       role: UserRole.CLIENT,
     });
   });
@@ -36,7 +41,13 @@ describe("register", async () => {
   test("If the email is already registered it should return an error.", async () => {
     const result = await register(
       { userService },
-      { name: "Sofia", email: "sofia@gmail.com", password: "User@1234", DNI: "87673527", role: UserRole.CLIENT }
+      {
+        name: "Sofia",
+        email: "sofia@gmail.com",
+        password: "User@1234",
+        DNI: "87673527",
+        role: UserRole.CLIENT,
+      }
     );
 
     expect(result).toBeInstanceOf(Error);

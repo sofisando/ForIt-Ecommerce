@@ -8,15 +8,15 @@ export class MockedUserService implements UserService {
     this.users = users;
   }
 
-  findById = async (id: string): Promise<User | undefined> => {
-    return this.users.find((user) => user.id == id);
+  findById = async (id: string): Promise<User | null> => {
+    return this.users.find((user) => user.id == id) ?? null;
   };
   findAll = async (): Promise<User[]> => {
     return this.users;
   };
-  editOne = async (id: string, updated: UserUpdate): Promise<User | null> => {
+  editOne = async (id: string, updated: UserUpdate): Promise<User> => {
     const index = this.users.findIndex((user) => user.id === id);
-    if (index === -1) return null;
+    if (index === -1) throw Error ("User not found");
 
     const edited = { ...this.users[index], ...updated } as User;
     this.users[index] = edited;

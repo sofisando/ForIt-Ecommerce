@@ -4,7 +4,7 @@ import { userMock } from "../../entities/mocks/user-mock";
 import { getUserList } from "./get-user-list";
 
 describe("getUserList", async() => {
-    test("cuando se llame debería traer la lista de usuarios", async () => {
+    test("Should return a array of users", async () => {
         const userService = new MockedUserService([
             userMock(),
             userMock()
@@ -15,7 +15,7 @@ describe("getUserList", async() => {
         expect(result).toHaveLength(2);
         expect(result).toStrictEqual(userService.users);
     });
-    test("si no hay usuarios debería devolver una lista vacía", async () => {;
+    test("if there are no users you should return an empty list", async () => {;
         const userService = new MockedUserService([])
         const result = await getUserList(
             { userService }
