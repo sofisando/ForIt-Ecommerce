@@ -8,17 +8,17 @@ export class MockedProductService implements ProductService {
     this.products = products;
   }
 
-  async findById(id: string): Promise<Product | undefined>{
-    return this.products.find((product) => product.id == id);
+  async findById(id: string): Promise<Product | null>{
+    return this.products.find((product) => product.id == id) ?? null;
   }
 
   async findAll(): Promise<Product[]> {
     return this.products;
   }
 
-  async editOne(id: string, updated: ProductUpdate): Promise<Product | null> {
+  async editOne(id: string, updated: ProductUpdate): Promise<Product> {
     const index = this.products.findIndex((p) => p.id === id);
-    if (index === -1) return null;
+    if (index === -1) throw Error("Product not found");
 
     const edited = { ...this.products[index], ...updated } as Product;
     this.products[index] = edited;
