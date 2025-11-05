@@ -1,5 +1,6 @@
 import type { Entity } from "../utils/types/entity.js";
-import type { Category, Product } from "./product.js";
+import type { Category } from "./category.js";
+import type { Product } from "./product.js";
 
 export const DiscountType = {
     PERCENTAGE: "PERCENTAGE",

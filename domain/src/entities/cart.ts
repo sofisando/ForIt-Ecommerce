@@ -1,6 +1,7 @@
 import type { Entity } from "../utils/types/entity.js";
 import type { DiscountInCart } from "./discount.js";
-import type { Product, Variant } from "./product.js";
+import type { Product } from "./product.js";
+import type { Variant } from "./variant.js";
 
 export interface ProductInCart {
     productId: Product['id'];

@@ -13,6 +13,7 @@ export type OrderState = typeof OrderState[keyof typeof OrderState];
 
 //ver como poner o donde poner para que esto quede como constante
 //se que habia una forma como pick<> para copiar y a ese le ponemos as const o algo asi
+// creo que eso seria mas para un dto. ver
 export interface Order extends Entity{
     userId: string;
     products: ProductInCart[];
