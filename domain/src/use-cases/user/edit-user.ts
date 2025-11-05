@@ -1,12 +1,12 @@
-import { User, UserUpdate } from "../../entities";
+import { User } from "../../entities";
 import { MockedUserService } from "../../services/mocks/mock-user-service";
+import { UpdatePayload } from "../../utils/types/payload";
 
 interface EditUserDeps {
   userService: MockedUserService;
 }
-interface EditUserPayload extends UserUpdate {
-  id: string;
-}
+
+type EditUserPayload = UpdatePayload<User>
 
 export async function editUser(
   { userService }: EditUserDeps,

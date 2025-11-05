@@ -1,32 +1,24 @@
-import { User, UserRole } from "../../entities/user.js";
+import type { User } from "../../entities/user.js";
 import type { UserService } from "../../services/user-service.js";
+import type { CreatePayload } from "../../utils/types/payload.js";
 
 interface RegisterDeps {
   userService: UserService;
 }
 
-interface RegisterPayload {
-  name: string;
-  email: string;
-  password: string;
-  DNI: string;
-  role: UserRole;
-}
+type RegisterPayload = CreatePayload<User>;
 
 export async function register(
   { userService }: RegisterDeps,
-  { email, name, password, DNI, role }: RegisterPayload
+  payload: RegisterPayload
 ): Promise<User | Error> {
-  const foundUser = await userService.findByEmail(email);
-  if (foundUser) return new Error(`Email ${email} is already registered`);
+  const foundUser = await userService.findByEmail(payload.email);
+  if (foundUser)
+    return new Error(`Email ${payload.email} is already registered`);
 
   const user = await userService.create({
     id: crypto.randomUUID(),
-    name,
-    email,
-    password,
-    role,
-    DNI,
+    ...payload,
   });
 
   return user;

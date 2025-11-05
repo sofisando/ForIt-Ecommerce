@@ -9,6 +9,7 @@ export function productMock(opts?: Partial<Product>): Product {
     imageUrl: faker.image.urlLoremFlickr(),
     price: faker.number.int({ max: 10000, min: 5000 }),
     categoryId: crypto.randomUUID(),
+    variants: [],
     ...opts,
   };
 }

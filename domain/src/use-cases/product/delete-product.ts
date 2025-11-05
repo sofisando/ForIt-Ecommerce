@@ -1,12 +1,13 @@
+import { Product } from "../../entities";
 import { MockedProductService } from "../../services/mocks/mock-product-service";
+import { DeletePayload } from "../../utils/types/payload";
 
 interface DeleteProductDeps {
   productService: MockedProductService;
 }
 
-interface DeleteProductPayload {
-  id: string;
-}
+type DeleteProductPayload = DeletePayload<Product>
+
 export async function deleteProduct(
   { productService }: DeleteProductDeps,
   { id }: DeleteProductPayload

@@ -1,12 +1,12 @@
-import { Product, ProductUpdate } from "../../entities";
+import { Product } from "../../entities";
 import { MockedProductService } from "../../services/mocks/mock-product-service";
+import { UpdatePayload } from "../../utils/types/payload";
 
 interface EditProductDeps {
   productService: MockedProductService;
 }
-interface EditProductPayload extends ProductUpdate {
-  id: string;
-}
+
+type EditProductPayload = UpdatePayload<Product>
 
 export async function editProduct(
   { productService }: EditProductDeps,

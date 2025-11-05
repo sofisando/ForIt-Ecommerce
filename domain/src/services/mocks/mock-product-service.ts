@@ -25,9 +25,9 @@ export class MockedProductService implements ProductService {
     return edited; // ✅ este sí es un Product completo
   }
 
-  async create(item: Product) {
-    this.products.push(item);
-    return item;
+  async create(product: Product) : Promise<Product> {
+    this.products.push(product);
+    return product;
   }
 
   async delete(id: string) {
