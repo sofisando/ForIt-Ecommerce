@@ -16,4 +16,3 @@ export interface User extends Entity {
 }
 
 export type SecureUser = Omit<User, "password">;
-export type UserUpdate = Partial<Omit<User, "id">>;
