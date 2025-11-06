@@ -5,8 +5,8 @@ import type { Variant } from "./variant.js";
 
 export interface ProductInCart {
     productId: Product['id'];
-    variantId?: Variant['id'];
-    discountApplied?: DiscountInCart;
+    variantId: Variant['id'] | undefined;
+    discountApplied: DiscountInCart | undefined;
     quantity: number;
     subtotal: number;
 }

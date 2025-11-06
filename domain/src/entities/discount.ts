@@ -13,8 +13,8 @@ export interface Discount extends Entity {
     name: string;
     type: DiscountType;
     value: number;
-    productsApplied?: Product['id'][];
-    categoriesApplied?: Category['id'][];
+    productsApplied: Product['id'][] | undefined;
+    categoriesApplied: Category['id'][] | undefined;
     active: boolean;
     dateFrom: Date;
     dateTo: Date;

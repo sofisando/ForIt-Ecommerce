@@ -12,17 +12,15 @@ export function cartMock(opts?: Partial<Cart>): Cart {
     products: [
       {
         productId: crypto.randomUUID(),
-        ...(hasVariant ? { variantId: crypto.randomUUID() } : {}),
-        ...(hasDiscount
+        variantId: hasVariant ? crypto.randomUUID() : undefined,
+        discountApplied: hasDiscount
           ? {
-              discountApplied: {
-                id: crypto.randomUUID(),
-                name: faker.commerce.productAdjective(),
-                type: faker.helpers.arrayElement(Object.values(DiscountType)),
-                value: faker.number.int({ min: 5, max: 50 }),
-              },
+              id: crypto.randomUUID(),
+              name: faker.commerce.productAdjective(),
+              type: faker.helpers.arrayElement(Object.values(DiscountType)),
+              value: faker.number.int({ min: 5, max: 50 }),
             }
-          : {}),
+          : undefined,
         quantity: faker.number.int({ min: 1, max: 10 }),
         subtotal: faker.number.int({ min: 0, max: 500 }),
       },

@@ -9,5 +9,5 @@ export interface Product extends Entity {
     imageUrl: string;
     price: number;
     categoryId: Category['id'];
-    variants?: Variant[];
+    variants: Variant[] | undefined;
 }
