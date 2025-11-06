@@ -1,20 +1,21 @@
 import { User } from "../../entities";
-import { MockedUserService } from "../../services/mocks/mock-user-service";
+import { UserService } from "../../services";
+
 import { UpdatePayload } from "../../utils/types/payload";
 
 interface EditUserDeps {
-  userService: MockedUserService;
+  userService: UserService;
 }
 
 type EditUserPayload = UpdatePayload<User>
 
 export async function editUser(
   { userService }: EditUserDeps,
-  { id, ...data }: EditUserPayload
+  payload: EditUserPayload
 ): Promise<User> {
-  const findUser = await userService.findById(id);
+  const findUser = await userService.findById(payload.id);
   if (!findUser) throw new Error("User not found");
-  const editedUser = await userService.editOne(id, data);
+  const editedUser = await userService.editOne(payload);
 
   return editedUser;
 }

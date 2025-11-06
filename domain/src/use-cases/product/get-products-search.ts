@@ -1,8 +1,8 @@
 import type { Product } from "../../entities";
-import { MockedProductService } from "../../services/mocks/mock-product-service";
+import { ProductService } from "../../services";
 
 interface GetProductsSearchDeps {
-  productService: MockedProductService;
+  productService: ProductService;
 }
 
 interface GetProductsSearchPayload {

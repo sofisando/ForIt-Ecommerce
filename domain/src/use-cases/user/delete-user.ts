@@ -1,9 +1,10 @@
 import { User } from "../../entities";
-import { MockedUserService } from "../../services/mocks/mock-user-service";
+import { UserService } from "../../services";
+
 import { DeletePayload } from "../../utils/types/payload";
 
 interface DeleteUserDeps {
-  userService: MockedUserService;
+  userService: UserService;
 }
 
 type DeleteUserPayload = DeletePayload<User>
@@ -15,5 +16,5 @@ export async function deleteUser(
   const foundUser = await userService.findById(id);
   if (!foundUser) throw new Error("User not found");
 
-  await userService.delete(id);
+  await userService.delete({id});
 }

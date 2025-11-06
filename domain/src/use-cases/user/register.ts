@@ -16,10 +16,7 @@ export async function register(
   if (foundUser)
     return new Error(`Email ${payload.email} is already registered`);
 
-  const user = await userService.create({
-    id: crypto.randomUUID(),
-    ...payload,
-  });
+  const user = await userService.create(payload);
 
   return user;
 }

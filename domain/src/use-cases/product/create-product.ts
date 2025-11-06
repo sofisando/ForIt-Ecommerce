@@ -6,16 +6,12 @@ interface CreateProductDeps {
   productService: ProductService;
 }
 
-type CreateProductPayload = CreatePayload<Product>
+type CreateProductPayload = CreatePayload<Product>;
 
 export async function createProduct(
   { productService }: CreateProductDeps,
   payload: CreateProductPayload
 ): Promise<Product> {
-  const product = await productService.create({
-    id: crypto.randomUUID(), //esto simula cuando la db genera el id
-    ...payload,
-  });
-
+  const product = await productService.create(payload);
   return product;
 }

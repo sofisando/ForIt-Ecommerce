@@ -1,8 +1,8 @@
 import { Product } from "../../entities";
-import { MockedProductService } from "../../services/mocks/mock-product-service";
+import { ProductService } from "../../services";
 
 interface GetProductsByCategoryDeps {
-  productService: MockedProductService;
+  productService: ProductService;
 }
 
 interface GetProductsByCategoryPayload {

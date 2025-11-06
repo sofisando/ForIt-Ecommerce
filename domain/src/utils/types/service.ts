@@ -1,4 +1,9 @@
-import type { Entity } from "./entity.js"; 
+import type { Entity } from "./entity.js";
+import type {
+  CreatePayload,
+  UpdatePayload,
+  DeletePayload,
+} from "./payload.js"; // o desde donde lo tengas
 
 export interface Service<TEntity extends Entity>
   extends ServiceQuery<TEntity>,
@@ -10,9 +15,7 @@ interface ServiceQuery<TEntity extends Entity> {
 }
 
 interface ServiceStorage<TEntity extends Entity> {
-  editOne: (id: string, data: Partial<TEntity>) => Promise<TEntity>;
-
-  // updateMany: (data: TEntity[]) => Promise<TEntity[] | undefined>; //ver
-  create: (data: TEntity) => Promise<TEntity>;
-  delete: (id: string) => Promise<void>;
+  create: (data: CreatePayload<TEntity>) => Promise<TEntity>;
+  editOne: (data: UpdatePayload<TEntity>) => Promise<TEntity>;
+  delete: (data: DeletePayload<TEntity>) => Promise<void>;
 }

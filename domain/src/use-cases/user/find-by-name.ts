@@ -1,8 +1,8 @@
 import { User } from "../../entities";
-import { MockedUserService } from "../../services/mocks/mock-user-service";
+import { UserService } from "../../services";
 
 interface FindByNameDeps {
-  userService: MockedUserService;
+  userService: UserService;
 }
 interface FindByNamePayload {
   name: string;

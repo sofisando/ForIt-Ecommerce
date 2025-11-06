@@ -2,7 +2,7 @@ import { describe, expect, test } from "vitest";
 import { MockedProductService } from "../../services/mocks/mock-product-service";
 import { productMock } from "../../entities/mocks/product-mock";
 import { createProduct } from "./create-product";
-import type { Variant } from "../../entities";
+import { Variant } from "../../entities/variant";
 
 describe("createProduct", async () => {
   const productService = new MockedProductService([
@@ -13,7 +13,7 @@ describe("createProduct", async () => {
       imageUrl: "http://example.com/existing-product.jpg",
       name: "Mouse",
       price: 49.99,
-      variants: [], //quizás este bueno probar el crear con variantes y sin variantes
+      variants: [],
     }),
   ]);
 
@@ -26,7 +26,7 @@ describe("createProduct", async () => {
         imageUrl: "http://example.com/other-product.jpg",
         name: "Laptop",
         price: 8000.0,
-        variants: [], //quizás este bueno probar el crear con variantes y sin variantes
+        variants: [],
       }
     );
 
@@ -43,12 +43,13 @@ describe("createProduct", async () => {
     expect(result).toStrictEqual(productService.products[1]);
   });
 
-  test("should create a new product whit variants", async () => {
+  test("should create a new product with variants", async () => {
     const categoryId = crypto.randomUUID();
     const variants: Variant[] = [
       { id: crypto.randomUUID(), attribute: "Color: Black" },
       { id: crypto.randomUUID(), attribute: "Size: Large" },
     ];
+
     const result = await createProduct(
       { productService },
       {

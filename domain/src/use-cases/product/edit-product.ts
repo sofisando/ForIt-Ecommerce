@@ -1,20 +1,20 @@
 import { Product } from "../../entities";
-import { MockedProductService } from "../../services/mocks/mock-product-service";
+import { ProductService } from "../../services";
 import { UpdatePayload } from "../../utils/types/payload";
 
 interface EditProductDeps {
-  productService: MockedProductService;
+  productService: ProductService;
 }
 
-type EditProductPayload = UpdatePayload<Product>
+type EditProductPayload = UpdatePayload<Product>;
 
 export async function editProduct(
   { productService }: EditProductDeps,
-  { id, ...data }: EditProductPayload
+  payload: EditProductPayload
 ): Promise<Product> {
-  const findProduct = await productService.findById(id);
-  if (!findProduct) throw new Error("Product not found");
-  const editedProduct = await productService.editOne(id, data);
+  const existing = await productService.findById(payload.id);
+  if (!existing) throw new Error("Product not found");
 
-  return editedProduct;
+  const updated = await productService.editOne(payload);
+  return updated;
 }
