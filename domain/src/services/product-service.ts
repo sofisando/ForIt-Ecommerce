@@ -1,4 +1,5 @@
-import type { Category, Product } from "../entities/product.js";
+import type { Category } from "../entities/category.js";
+import type { Product } from "../entities/product.js";
 import type { Service } from "../utils/types/service.js";
 
 export interface ProductService extends Service<Product> {
