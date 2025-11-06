@@ -13,8 +13,8 @@ describe("deleteProduct", async () => {
     const result = await deleteProduct({ productService }, { id: "1" });
     expect(result).toBeUndefined();
 
-    const users = await productService.findAll();
-    expect(users).toHaveLength(1);
+    const products = await productService.findAll();
+    expect(products).toHaveLength(1);
   });
   test("Should throw if product not found", async () => {
     const productService = new MockedProductService([]);
