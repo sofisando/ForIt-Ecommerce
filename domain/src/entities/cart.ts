@@ -1,6 +1,7 @@
 import type { Entity } from "../utils/types/entity.js";
 import type { DiscountInCart } from "./discount.js";
 import type { Product } from "./product.js";
+import type { User } from "./user.js";
 import type { Variant } from "./variant.js";
 
 export interface ProductInCart {
@@ -12,7 +13,7 @@ export interface ProductInCart {
 }
 
 export interface Cart extends Entity{
-    userId: string;
+    userId: User["id"];
     products: ProductInCart[];
     total: number;
 }
