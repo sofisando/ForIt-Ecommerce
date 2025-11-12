@@ -1,6 +1,5 @@
 import { describe, expect, test } from "vitest";
 import { MockedCartService } from "../../services/mocks/mock-cart-service";
-import { cartMock } from "../../entities/mocks/cart-mock";
 import { createCart } from "./create-cart";
 import { MockedUserService } from "../../services/mocks/mock-user-service";
 import { userMock } from "../../entities/mocks/user-mock";
