@@ -1,11 +1,12 @@
 import { Product, ProductInCart, User } from "../../entities";
 import { Variant } from "../../entities/variant";
-import { CartService, UserService } from "../../services";
+import { CartService, UserService, ProductService } from "../../services";
 import { createCart } from "../cart/create-cart.js";
 
 interface AddProductToCartDeps {
   cartService: CartService;
   userService: UserService;
+  productService: ProductService;
 }
 
 interface AddProductToCartPayload {
@@ -16,18 +17,19 @@ interface AddProductToCartPayload {
 }
 
 export async function addProductToCart(
-  { cartService, userService }: AddProductToCartDeps,
+  { cartService, userService, productService }: AddProductToCartDeps,
   { userId, productId, variantId, quantity }: AddProductToCartPayload
 ) {
   let cart = await cartService.getCartByUserId(userId);
 
-  // ✅ Si no existe carrito, se usa el caso de uso createCart
+  // Si no existe carrito, lo crea
   if (!cart) {
     const result = await createCart({ cartService, userService }, { userId });
     if (result instanceof Error) throw result;
     cart = result;
   }
 
+  // Buscar si ya existe un producto igual (mismo id y variante)
   const existing = cart.products.find(
     (p) => p.productId === productId && p.variantId === variantId
   );
@@ -35,14 +37,23 @@ export async function addProductToCart(
   if (existing) {
     existing.quantity += quantity;
   } else {
+    // Buscar el producto real para armar snapshot
+    const product = await productService.findById(productId);
+    if (!product) throw new Error("Product not found");
+
     const newProduct: ProductInCart = {
       productId,
+      name: product.name,
+      price: product.price,
+      categoryId: product.categoryId,
       variantId,
       discountApplied: undefined,
       quantity,
       subtotal: 0,
     };
+
     cart.products.push(newProduct);
   }
+
   return cartService.save(cart);
 }
