@@ -5,7 +5,6 @@ import { MockedDiscountService } from "../../services/mocks/mock-discount-servic
 import { discountMock } from "../../entities/mocks/discount-mock";
 import {
   applyDiscountsToProducts,
-  ProductWithDiscountApplied,
 } from "./applyDiscountsToProducts";
 
 describe("applyDiscountsToProducts", () => {
