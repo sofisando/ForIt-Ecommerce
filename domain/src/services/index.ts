@@ -1,5 +1,6 @@
 export * from "./auth-service.js";
 export * from "./cart-service.js";
+export * from "./category-service.js";
 export * from "./discount-service.js";
 export * from "./email-service.js";
 export * from "./product-service.js";
