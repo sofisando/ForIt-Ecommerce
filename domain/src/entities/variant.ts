@@ -1,6 +1,8 @@
 import { Entity } from "../utils";
+import { Product } from "./product";
 
 export interface Variant extends Entity { 
-    attribute: string;
-    // stock si se complica
-}
+    attribute: {};
+    productId: Product['id'];
+    // extraPrice?: number; //para el futuro
+}   
