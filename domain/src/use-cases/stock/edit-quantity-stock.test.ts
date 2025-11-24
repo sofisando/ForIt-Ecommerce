@@ -1,7 +1,7 @@
 import { describe, test, expect } from "vitest";
 import { stockMock } from "../../entities/mocks/stock-mock";
 import { MockedStockService } from "../../services/mocks/mock-stock-service";
-import { editStock } from "./edit-stock";
+import { editStock } from "./edit-quantity-stock";
 
 
 describe("editStock", () => {
