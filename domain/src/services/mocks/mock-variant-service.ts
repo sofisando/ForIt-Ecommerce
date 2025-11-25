@@ -1,4 +1,3 @@
-
 import { Variant } from "../../entities/variant.js";
 import { CreatePayload, UpdatePayload } from "../../utils/index.js";
 import { VariantService } from "../variant-service.js";
@@ -33,10 +32,24 @@ export class MockedVariantService implements VariantService {
     this.variants.push(newVariant);
     return newVariant;
   };
-  delete = async (data: {id: String}): Promise<void> => {
+  delete = async (data: { id: String }): Promise<void> => {
     this.variants = this.variants.filter((u) => u.id !== data.id);
   };
   getVariantsByProduct = async (productId: string): Promise<Variant[]> => {
-    return this.variants.filter(v => v.productId === productId);
+    return this.variants.filter((v) => v.productId === productId);
+  };
+  findByAttribute = async (
+    productId: string,
+    title: string,
+    name: string
+  ): Promise<Variant | null> => {
+    return (
+      this.variants.find(
+        (variant) =>
+          variant.productId === productId &&
+          variant.attribute.title.toLowerCase() === title.toLowerCase() &&
+          variant.attribute.name.toLowerCase() === name.toLowerCase()
+      ) ?? null
+    );
   };
 }
