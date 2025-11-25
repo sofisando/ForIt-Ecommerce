@@ -13,10 +13,7 @@ export async function getProductsByCategory(
   { productService }: GetProductsByCategoryDeps,
   { categoryId }: GetProductsByCategoryPayload
 ): Promise<Product[]> {
-  const allProducts = await productService.findAll();
-  const filteredProducts = allProducts.filter(
-    (product) => product.categoryId === categoryId
-  );
+  const filteredProducts = await productService.getProductsByCategory(categoryId);
 
   return filteredProducts;
 }
