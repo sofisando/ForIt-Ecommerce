@@ -11,7 +11,12 @@ export function orderMock(opts?: Partial<Order>): Order {
   const variant = hasVariant
     ? {
         id: crypto.randomUUID(),
-        attribute: faker.commerce.productMaterial(),
+        attribute: {
+          title: "Tamaño",
+          name: faker.helpers.arrayElement(Object.values(["S", "M", "L"])),
+          value: null,
+        },
+        productId: crypto.randomUUID(),
       }
     : undefined;
 
@@ -34,10 +39,11 @@ export function orderMock(opts?: Partial<Order>): Order {
       productId: crypto.randomUUID(),
       name: faker.commerce.productName(),
       price: faker.number.int({ min: 1000, max: 10000 }),
-      quantity: faker.number.int({ min: 1, max: 3 }),
-      subtotal: faker.number.int({ min: 1000, max: 30000 }),
+      categoryId:  crypto.randomUUID(),
       variant,
       discountApplied,
+      quantity: faker.number.int({ min: 1, max: 3 }),
+      subtotal: faker.number.int({ min: 1000, max: 30000 }),
     },
   ];
 

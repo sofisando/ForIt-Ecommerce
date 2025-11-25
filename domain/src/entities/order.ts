@@ -10,7 +10,12 @@ interface DiscountInCart {
 // “Snapshot” de la variante en el momento del checkout
 interface VariantInCart {
   id: string;
-  attribute: string;
+  attribute: {
+    title: string; // "Color" | "Tamaño" | "Material"
+    name: string; // "Rojo" | "S" | "Cuero"
+    value: string | null; // "#ff0000" | URL de imagen | null
+  };
+  productId: string;
 }
 // “Snapshot” del producto en el momento del checkout
 export interface ProductInOrder {
