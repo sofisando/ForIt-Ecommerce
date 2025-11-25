@@ -1,4 +1,4 @@
-import { Order } from "../../entities/order.js";
+import { Order, OrderState } from "../../entities/order.js";
 import { User } from "../../entities/user.js";
 import { CreatePayload, UpdatePayload } from "../../utils/index.js";
 import { OrderService } from "../order-service.js";
@@ -38,5 +38,12 @@ export class MockedOrderService implements OrderService {
   };
   getOrdersByUserId = async (userId: User['id']): Promise<Order[]> =>{
     return this.orders.filter((order)=> order.userId === userId);
+  };
+  updateStateOrder = async (id: Order['id'], state: OrderState): Promise<Order | Error> =>{
+    const index = this.orders.findIndex((order) => order.id === id);
+    if (index === -1) return new Error("Order not found");
+
+    this.orders[index]!.state = state;
+    return this.orders[index]!;
   };
 }
