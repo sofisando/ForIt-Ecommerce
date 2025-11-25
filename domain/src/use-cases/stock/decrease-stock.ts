@@ -1,8 +1,10 @@
 import { Stock } from "../../entities/stock";
+import { VariantService } from "../../services";
 import type { StockService } from "../../services/stock-service";
 
 interface DecreaseStockDeps {
   stockService: StockService;
+  variantService: VariantService;
 }
 
 interface DecreaseStockPayload {
@@ -11,18 +13,21 @@ interface DecreaseStockPayload {
   amount: number;
 }
 
-export async function decreaseStock({stockService}: DecreaseStockDeps,
+export async function decreaseStock({stockService, variantService}: DecreaseStockDeps,
   {variantId, branchId , amount}: DecreaseStockPayload
 ): Promise< Stock | Error > {
   
     const stock = await stockService.getByVariantAndBranch(variantId, branchId);
 
     if (!stock) {
-      return new Error("Stock not found for this variant");
+      const variant = await variantService.findById(variantId);
+      return new Error(`Stock not found for variant: ${variant!.attribute.name}`);
+      //despues poner en qué producto no hay stock de esa variante
     }
 
     if (stock.quantity < amount) {
-      return new Error("Not enough stock");
+      const variant = await variantService.findById(variantId);
+      return new Error(`Not enough stock for variant: ${variant?.attribute.name}`);
     }
 
     const stockUpdated = stockService.editOne({
