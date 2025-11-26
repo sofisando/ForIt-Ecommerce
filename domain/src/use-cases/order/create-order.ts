@@ -1,60 +1,80 @@
-import type { Cart } from "../../entities/cart.js";
-import type { Order, OrderState } from "../../entities/order.js";
+import type { Order, ProductInOrder } from "../../entities/order.js";
 import type { ProductService } from "../../services/product-service.js";
+import type { VariantService } from "../../services/variant-service.js";
 import type { OrderService } from "../../services/order-service.js";
-import { OrderState as State } from "../../entities/order.js";
+import { OrderState } from "../../entities/order.js";
+import type { CreatePayload } from "../../utils/index.js";
+import type { Cart } from "../../entities/cart.js";
 
 interface CreateOrderDeps {
   orderService: OrderService;
   productService: ProductService;
+  variantService: VariantService;
 }
 
-interface CreateOrderPayload {
-  cart: Cart;
-}
+type CreateOrderPayload = CreatePayload<Cart> & {
+  branchId: string | null;
+};
+
 
 export async function createOrder(
-  { orderService, productService }: CreateOrderDeps,
-  { cart }: CreateOrderPayload
-): Promise<Order> {
-  // Obtener información de los productos del carrito
-  const productSnapshots = await Promise.all(
-    cart.products.map(async (item) => {
-      const product = await productService.findById(item.productId);
-      if (!product) throw new Error(`Product ${item.productId} not found`);
+  { orderService, productService, variantService }: CreateOrderDeps,
+  payload: CreateOrderPayload
+): Promise<Order | Error> {
+  // 1. Convertir cada ProductInCart a ProductInOrder (con snapshots)
+  const productSnapshots: ProductInOrder[] = [];
 
-      return {
-        productId: product.id,
-        name: product.name,
-        price: product.price,
-        quantity: item.quantity,
-        subtotal: item.subtotal,
-        variant: item.variantId
-          ? { id: item.variantId, attribute: "Color Azul" } // buscar si querés
-          : undefined,
-        discountApplied: item.discountApplied
-          ? {
-              ...item.discountApplied,
-              // opcional: si querés asegurarte de tener snapshot completo
-              active: item.discountApplied.active ?? true,
-              dateFrom: item.discountApplied.dateFrom ?? new Date(),
-              dateTo: item.discountApplied.dateTo ?? new Date(),
-            }
-          : undefined,
+  for (const item of payload.products) {
+    // --- Buscar el producto ---
+    const product = await productService.findById(item.productId);
+    if (!product) return new Error(`Product ${item.productId} not found`);
+
+    // --- Buscar variante (si existe) ---
+    let variantSnapshot = undefined;
+    if (item.variantId) {
+      const variant = await variantService.findById(item.variantId);
+      if (!variant) return new Error(`Variant ${item.variantId} not found`);
+
+      variantSnapshot = {
+        id: variant.id,
+        attribute: {
+          title: variant.attribute.title,
+          name: variant.attribute.name,
+          value: variant.attribute.value,
+        },
       };
-    })
-  );
+    }
 
-  const order: Order = {
-    id: crypto.randomUUID(),
-    userId: cart.userId,
+    // --- Construir snapshot del producto ---
+    productSnapshots.push({
+      productId: product.id,
+      name: product.name,
+      price: product.price,
+      variant: variantSnapshot,
+      discountApplied: item.discountApplied
+        ? {
+            id: item.discountApplied.id,
+            name: item.discountApplied.name,
+            type: item.discountApplied.type,
+            value: item.discountApplied.value,
+          }
+        : undefined,
+      quantity: item.quantity,
+      subtotal: item.subtotal,
+    });
+  }
+
+  // 2. Armar objeto Order SIN id (la db lo crea)
+  const orderData: CreatePayload<Order> = {
+    userId: payload.userId,
     products: productSnapshots,
-    total: cart.total, // se guarda el total actual del carrito
-    state: State.PENDING,
+    branchId: payload.branchId,
+    total: payload.total,
+    state: OrderState.PENDING,
     date: new Date(),
   };
 
-  await orderService.create(order);
-
-  return order;
+  // 3. Crear order usando el servicio (mock genera id)
+  const created = await orderService.create(orderData);
+  return created;
 }
