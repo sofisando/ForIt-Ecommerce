@@ -8,7 +8,6 @@ export interface ProductInCart {
   productId: Product["id"];
   name: string;
   price: number;
-  categoryId: string;
   variantId: Variant["id"] | undefined;
   discountApplied: DiscountInCart | undefined;
   quantity: number;

@@ -15,7 +15,6 @@ interface VariantInCart {
     name: string; // "Rojo" | "S" | "Cuero"
     value: string | null; // "#ff0000" | URL de imagen | null
   };
-  productId: string;
 }
 // “Snapshot” del producto en el momento del checkout
 export interface ProductInOrder {
@@ -42,6 +41,7 @@ export type OrderState = (typeof OrderState)[keyof typeof OrderState];
 export interface Order extends Entity {
   userId: string;
   products: ProductInOrder[];
+  branchId: string | null;
   total: number;
   state: OrderState;
   date: Date;

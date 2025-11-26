@@ -14,7 +14,6 @@ export function cartMock(opts?: Partial<Cart>): Cart {
         productId: crypto.randomUUID(),
         name: faker.commerce.productName(),
         price: faker.number.int({ max: 10000, min: 5000 }),
-        categoryId:  crypto.randomUUID(),
         variantId: hasVariant ? crypto.randomUUID() : undefined,
         discountApplied: hasDiscount
           ? {
