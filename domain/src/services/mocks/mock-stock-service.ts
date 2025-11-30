@@ -55,4 +55,14 @@ export class MockedStockService implements StockService {
       ) ?? null
     );
   };
+  getByProductAndBranch = async (
+    productId: string,
+    branchId: string | null
+  ): Promise<Stock | null> => {
+    return (
+      this.stocks.find(
+        (s) => s.productId === productId && s.branchId === branchId
+      ) ?? null
+    );
+  };
 }
