@@ -11,6 +11,7 @@ import { orderMock } from "../../entities/mocks/order-mock.js";
 
 describe("acceptOrder", () => {
   const orderService = new MockedOrderService([
+    // Caso con variante
     orderMock({
       id: "order-1",
       state: "pending",
@@ -30,6 +31,8 @@ describe("acceptOrder", () => {
       ],
       branchId: "branch-1",
     }),
+
+    // Estado no válido
     orderMock({
       id: "order-2",
       state: "accepted",
@@ -37,6 +40,7 @@ describe("acceptOrder", () => {
       branchId: "branch-2",
     }),
 
+    // Caso sin variante → usa productId
     orderMock({
       id: "order-3",
       state: "pending",
@@ -54,6 +58,7 @@ describe("acceptOrder", () => {
       branchId: "branch-2",
     }),
   ]);
+
   const variantService = new MockedVariantService([
     variantMock({
       id: "Variant-1",
@@ -61,18 +66,30 @@ describe("acceptOrder", () => {
       productId: "p1",
     }),
   ]);
+
   const productService = new MockedProductService([
     productMock({ id: "p1", name: "Laptop", price: 1000 }),
   ]);
+
   const stockService = new MockedStockService([
     stockMock({
       variantId: "Variant-1",
       branchId: "branch-1",
       quantity: 10,
     }),
+    // stock por product (para el caso sin variante)
+    stockMock({
+      productId: "p1",
+      branchId: "branch-2",
+      quantity: 10,
+    }),
   ]);
 
-  test("if state order is not 'pendind' return error", async () => {
+  // -------------------------
+  // TESTS
+  // -------------------------
+
+  test("if state order is not 'pending' return error", async () => {
     const result = await acceptOrder(
       { orderService, productService, variantService, stockService },
       { orderId: "order-2" }
@@ -94,6 +111,7 @@ describe("acceptOrder", () => {
 
   test("should return error when variant not found", async () => {
     const variantService = new MockedVariantService([]);
+
     const result = await acceptOrder(
       { orderService, productService, variantService, stockService },
       { orderId: "order-1" }
@@ -104,22 +122,26 @@ describe("acceptOrder", () => {
 
   test("should return error when stock variant not found", async () => {
     const stockService = new MockedStockService([]);
+
     const result = await acceptOrder(
       { orderService, productService, variantService, stockService },
       { orderId: "order-1" }
     );
 
-    expect(result).toStrictEqual(Error("Stock not found for variant: Madera"));
-  }),
+    expect(result).toStrictEqual(
+      Error("Stock not found for variant: Madera")
+    );
+  });
 
-  test("should return error when stock is insufficient", async () => {
+  test("should return error when stock is insufficient (variant)", async () => {
     const stockService = new MockedStockService([
       stockMock({
         variantId: "Variant-1",
         branchId: "branch-1",
-        quantity: 1, //necesitamos 2
+        quantity: 1, // necesita 2
       }),
     ]);
+
     const result = await acceptOrder(
       { orderService, productService, variantService, stockService },
       { orderId: "order-1" }
@@ -128,9 +150,9 @@ describe("acceptOrder", () => {
     expect(result).toStrictEqual(
       Error("Not enough stock for variant: Madera")
     );
-  }),
+  });
 
-  test("should verify products and variant, and change state order to 'ACCEPTED'", async () => {
+  test("should verify products and variant and change state to ACCEPTED", async () => {
     const result = await acceptOrder(
       { orderService, productService, variantService, stockService },
       { orderId: "order-1" }
@@ -141,7 +163,7 @@ describe("acceptOrder", () => {
     expect(result.state).toBe("accepted");
   });
 
-  test("succes case without variant", async () => {
+  test("success case without variant → uses product stock", async () => {
     const result = await acceptOrder(
       { orderService, productService, variantService, stockService },
       { orderId: "order-3" }
@@ -154,6 +176,7 @@ describe("acceptOrder", () => {
 
   test("should return error when order not found", async () => {
     const orderService = new MockedOrderService([]);
+
     const result = await acceptOrder(
       { orderService, productService, variantService, stockService },
       { orderId: "order-1" }

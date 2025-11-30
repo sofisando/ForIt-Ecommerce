@@ -3,7 +3,8 @@ import type { VariantService } from "../../services/variant-service.js";
 import type { OrderService } from "../../services/order-service.js";
 import { Order, OrderState } from "../../entities/order.js";
 import { StockService } from "../../services/stock-service.js";
-import { decreaseStock } from "../stock/decrease-stock.js";
+import { decreaseStockForVariant } from "../stock/decrease-stock-for-variant.js";
+import { decreaseStockForProduct } from "../stock/decrease-stock-for-product.js";
 
 interface AcceptOrderDeps {
   orderService: OrderService;
@@ -17,7 +18,12 @@ interface AcceptOrderPayload {
 }
 
 export async function acceptOrder(
-  { orderService, productService, variantService, stockService }: AcceptOrderDeps,
+  {
+    orderService,
+    productService,
+    variantService,
+    stockService,
+  }: AcceptOrderDeps,
   { orderId }: AcceptOrderPayload
 ) {
   const order = await orderService.findById(orderId);
@@ -32,24 +38,35 @@ export async function acceptOrder(
     if (!product) return new Error(`Product ${item.productId} not found`);
 
     // Si tiene variante → validar y descontar stock
-    if (item.variant?.id) {
+    if (item.variant) {
       const variant = await variantService.findById(item.variant.id);
       if (!variant) return new Error(`Variant ${item.variant.id} not found`);
 
-      const stockResult = await decreaseStock(
+      const result = await decreaseStockForVariant(
         { stockService, variantService },
         {
           variantId: item.variant.id,
-          branchId: order.branchId, 
+          branchId: order.branchId,
           amount: item.quantity,
         }
       );
 
-      if (stockResult instanceof Error) return stockResult;
+      if (result instanceof Error) return result;
+    } else {
+      // producto sin variantes → usar productId
+      const result = await decreaseStockForProduct(
+        { stockService , productService},
+        {
+          productId: item.productId,
+          branchId: order.branchId,
+          amount: item.quantity,
+        }
+      );
+
+      if (result instanceof Error) return result;
     }
   }
 
   // Finalmente, cambiar estado
   return await orderService.updateStateOrder(order.id, OrderState.ACEPTED);
 }
-
