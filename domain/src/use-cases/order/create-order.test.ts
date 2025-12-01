@@ -8,6 +8,9 @@ import { productMock } from "../../entities/mocks/product-mock.js";
 
 import { createOrder } from "./create-order.js";
 import { variantMock } from "../../entities/mocks/variant-mock.js";
+import { MockedUserService } from "../../services/mocks/mock-user-service.js";
+import { userMock } from "../../entities/mocks/user-mock.js";
+import { MockedEmailService } from "../../services/mocks/mock-email-service.js";
 
 describe("createOrder", () => {
   const orderService = new MockedOrderService([]);
@@ -17,6 +20,10 @@ describe("createOrder", () => {
   const productService = new MockedProductService([
     productMock({ id: "p1", name: "Laptop", price: 1000 }),
   ]);
+  const userService = new MockedUserService([
+    userMock({ id: "u1", email: "prueba@gmail.com" }),
+  ]);
+  const emailService = new MockedEmailService();
   test("should create an order from a cart snapshot", async () => {
     const cart = cartMock({
       userId: "u1",
@@ -43,7 +50,13 @@ describe("createOrder", () => {
     };
 
     const result = await createOrder(
-      { orderService, productService, variantService },
+      {
+        orderService,
+        productService,
+        variantService,
+        emailService,
+        userService,
+      },
       payload
     );
 
@@ -62,6 +75,11 @@ describe("createOrder", () => {
 
     expect(result.state).toBe("pending");
     expect(orderService.orders).toContainEqual(result);
+    expect(emailService.sent.length).toBe(1);
+    expect(emailService.sent[0]).toMatchObject({
+      to: "prueba@gmail.com",
+      subject: "Gracias por tu compra",
+    });
   });
 
   test("should return error when product not found", async () => {
@@ -92,7 +110,13 @@ describe("createOrder", () => {
     };
 
     const result = await createOrder(
-      { orderService, productService, variantService },
+      {
+        orderService,
+        productService,
+        variantService,
+        emailService,
+        userService,
+      },
       payload
     );
 
@@ -125,7 +149,13 @@ describe("createOrder", () => {
     };
 
     const result = await createOrder(
-      { orderService, productService, variantService },
+      {
+        orderService,
+        productService,
+        variantService,
+        emailService,
+        userService,
+      },
       payload
     );
 

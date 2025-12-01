@@ -5,22 +5,30 @@ import type { OrderService } from "../../services/order-service.js";
 import { OrderState } from "../../entities/order.js";
 import type { CreatePayload } from "../../utils/index.js";
 import type { Cart } from "../../entities/cart.js";
+import { notifyNewOrder } from "../email/notify-new-order.js";
+import type { EmailService } from "../../services/email-service.js";
+import { UserService } from "../../services/user-service.js";
 
 interface CreateOrderDeps {
   orderService: OrderService;
   productService: ProductService;
   variantService: VariantService;
+  emailService: EmailService;
+  userService: UserService;
 }
 
 type CreateOrderPayload = CreatePayload<Cart> & {
   branchId: string | null;
 };
 
-
 export async function createOrder(
-  { orderService, productService, variantService }: CreateOrderDeps,
+  { orderService, productService, variantService, emailService, userService}: CreateOrderDeps,
   payload: CreateOrderPayload
 ): Promise<Order | Error> {
+  //verificar que el usuario exista
+  const user = await userService.findById(payload.userId);
+  if (!user) return new Error(`User ${payload.userId} not found`);
+
   // 1. Convertir cada ProductInCart a ProductInOrder (con snapshots)
   const productSnapshots: ProductInOrder[] = [];
 
@@ -75,6 +83,13 @@ export async function createOrder(
   };
 
   // 3. Crear order usando el servicio (mock genera id)
-  const created = await orderService.create(orderData);
-  return created;
+  const createdOrder = await orderService.create(orderData);
+
+  // >>> Llamás al caso de uso de notificación
+  await notifyNewOrder(
+    { emailService, orderService },
+    { userEmail: user.email , orderId: createdOrder.id }
+  );
+
+  return createdOrder;
 }
