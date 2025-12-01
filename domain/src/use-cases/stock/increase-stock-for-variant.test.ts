@@ -1,14 +1,14 @@
 import { describe, test, expect } from "vitest";
 import { stockMock } from "../../entities/mocks/stock-mock";
-import { increaseStock } from "./increase-stock";
+import { increaseStockForVariant } from "./increase-stock-for-variant";
 import { MockedStockService } from "../../services/mocks/mock-stock-service";
 
-describe("increaseStock", () => {
+describe("increaseStockForVariantForVariant", () => {
   test("increases existing stock", async () => {
     const stockService = new MockedStockService([
       stockMock({ variantId: "V1", branchId: null, quantity: 5 }),
     ]);
-    await increaseStock(
+    await increaseStockForVariant(
       { stockService },
       { variantId: "V1", branchId: null, amount: 10 }
     );
@@ -18,7 +18,7 @@ describe("increaseStock", () => {
 
   test("Should throw error if stock not found for the variant", async () => {
     const stockService = new MockedStockService([]);
-    const result = await increaseStock(
+    const result = await increaseStockForVariant(
       { stockService },
       { variantId: "V1", branchId: null, amount: 10 }
     );

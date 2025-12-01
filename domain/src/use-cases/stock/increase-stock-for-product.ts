@@ -1,24 +1,24 @@
 import { Stock } from "../../entities/stock";
 import type { StockService } from "../../services/stock-service";
 
-interface IncreaseStockDeps {
+interface IncreaseStockProductDeps {
   stockService: StockService;
 }
 
-interface IncreaseStockPayload {
-  variantId: string;
+interface IncreaseStockProductPayload {
+  productId: string;
   branchId: string | null;
   amount: number;
 }
 
-export async function increaseStock(
-  { stockService }: IncreaseStockDeps,
-  { variantId, branchId, amount }: IncreaseStockPayload
+export async function increaseStockForProduct(
+  { stockService }: IncreaseStockProductDeps,
+  { productId, branchId, amount }: IncreaseStockProductPayload
 ): Promise<Stock | Error> {
-    const stock = await stockService.getByVariantAndBranch(variantId, branchId);
+    const stock = await stockService.getByProductAndBranch(productId, branchId);
 
     if (!stock) {
-      return new Error("Stock not found for this variant");
+      return new Error("Stock not found for this product");
     }
 
     const stockUpdated = await stockService.editOne({
