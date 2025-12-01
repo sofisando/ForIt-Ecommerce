@@ -5,27 +5,33 @@ import { Order, OrderState } from "../../entities/order.js";
 import { StockService } from "../../services/stock-service.js";
 import { increaseStockForVariant } from "../stock/increase-stock-for-variant.js";
 import { increaseStockForProduct } from "../stock/increase-stock-for-product.js";
+import type { UserService } from "../../services/user-service.js";
+import type { EmailService } from "../../services/email-service.js";
+import type { User } from "../../entities/user.js";
+import { notifyCalcelOrder } from "../email/notify-cancel-order.js";
 
 interface CancelOrderDeps {
   orderService: OrderService;
   productService: ProductService;
   stockService: StockService;
   variantService: VariantService;
+  userService: UserService;
+  emailService: EmailService;
 }
 
 interface CancelOrderPayload {
   orderId: Order["id"];
+  userId: User["id"];
 }
 
 export async function cancelOrder(
-  {
-    orderService,
-    productService,
-    variantService,
-    stockService,
-  }: CancelOrderDeps,
-  { orderId }: CancelOrderPayload
+  { orderService, productService, variantService, stockService, emailService, userService }: CancelOrderDeps,
+  { orderId, userId }: CancelOrderPayload
 ) {
+  //verificar que el usuario exista
+  const user = await userService.findById(userId);
+  if (!user) return new Error(`User ${userId} not found`);
+
   const order = await orderService.findById(orderId);
   if (!order) return new Error("Order not found");
 
@@ -68,13 +74,20 @@ export async function cancelOrder(
       );
 
       if (result instanceof Error) {
-        return new Error(
-          `Stock not found for product: ${product.name}`
-        );
+        return new Error(`Stock not found for product: ${product.name}`);
       }
     }
   }
 
   // Finalmente, cambiar estado
-  return await orderService.updateStateOrder(order.id, OrderState.CANCELED);
+  const updatedStateOrder = await orderService.updateStateOrder(
+    order.id,
+    OrderState.CANCELED
+  );
+  // Mandar notificacion por email
+  await notifyCalcelOrder(
+    { emailService, orderService },
+    { userEmail: user.email, orderId: order.id }
+  );
+  return updatedStateOrder;
 }
