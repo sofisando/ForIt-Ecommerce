@@ -89,7 +89,10 @@ describe("acceptOrder", () => {
   ]);
 
   const emailService = new MockedEmailService();
-  const userService = new MockedUserService([userMock({ id: "user-1", email: "prueba@gmail.com"})]);
+  const userService = new MockedUserService([
+    userMock({ id: "user-1", email: "prueba@gmail.com" , role: "ADMIN"}),
+    userMock({ id: "user-2", email: "prueba@gmail.com" , role: "CLIENT"})
+  ]);
   // -------------------------
   // TESTS
   // -------------------------
@@ -199,4 +202,12 @@ describe("acceptOrder", () => {
 
     expect(result).toStrictEqual(Error("Order not found"));
   });
+
+  test("Should return error if user is not ADMIN", async () => {
+      const result = await acceptOrder(
+        { orderService, productService, variantService, stockService, emailService, userService },
+        { orderId: "order-1", userId: "user-2" }
+      );
+      expect(result).toStrictEqual(Error("User is not ADMIN"));
+    });
 });

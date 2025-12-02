@@ -7,7 +7,7 @@ import { decreaseStockForVariant } from "../stock/decrease-stock-for-variant.js"
 import { decreaseStockForProduct } from "../stock/decrease-stock-for-product.js";
 import type { UserService } from "../../services/user-service.js";
 import type { EmailService } from "../../services/email-service.js";
-import type { User } from "../../entities/user.js";
+import { UserRole, type User } from "../../entities/user.js";
 import { notifyUpdateStateOrder } from "../email/notify-update-state-order.js";
 
 interface AcceptOrderDeps {
@@ -25,13 +25,23 @@ interface AcceptOrderPayload {
 }
 
 export async function acceptOrder(
-  { orderService, productService, variantService, stockService, emailService, userService }: AcceptOrderDeps,
+  {
+    orderService,
+    productService,
+    variantService,
+    stockService,
+    emailService,
+    userService,
+  }: AcceptOrderDeps,
   { orderId, userId }: AcceptOrderPayload
 ) {
-
   //verificar que el usuario exista
   const user = await userService.findById(userId);
   if (!user) return new Error(`User ${userId} not found`);
+
+  if (user.role !== UserRole.ADMIN) {
+    return new Error(`User is not ${UserRole.ADMIN}`);
+  }
 
   const order = await orderService.findById(orderId);
   if (!order) return new Error("Order not found");
@@ -62,7 +72,7 @@ export async function acceptOrder(
     } else {
       // producto sin variantes → usar productId
       const result = await decreaseStockForProduct(
-        { stockService , productService},
+        { stockService, productService },
         {
           productId: item.productId,
           branchId: order.branchId,
@@ -75,12 +85,15 @@ export async function acceptOrder(
   }
 
   // Finalmente, cambiar estado
-  const aceptedOrder = await orderService.updateStateOrder(order.id, OrderState.ACEPTED);
+  const aceptedOrder = await orderService.updateStateOrder(
+    order.id,
+    OrderState.ACEPTED
+  );
   // Mandar notificacion por email
-    await notifyUpdateStateOrder(
-      { emailService, orderService },
-      { userEmail: user.email , orderId: order.id , state: OrderState.ACEPTED}
-    );
+  await notifyUpdateStateOrder(
+    { emailService, orderService },
+    { userEmail: user.email, orderId: order.id, state: OrderState.ACEPTED }
+  );
 
   return aceptedOrder;
 }
