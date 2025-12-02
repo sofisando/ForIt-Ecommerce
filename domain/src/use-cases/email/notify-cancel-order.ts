@@ -1,6 +1,5 @@
 import { Order, User } from "../../entities";
-import { EmailService } from "../../services";
-import { OrderService } from "../../services/order-service";
+import type { EmailService, OrderService } from "../../services";
 
 interface NotifyCancelOrderDeps {
   emailService: EmailService;

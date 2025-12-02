@@ -1,5 +1,5 @@
 import { User } from "../../entities";
-import { EmailService, UserService } from "../../services";
+import type { EmailService, UserService } from "../../services";
 
 interface NotifyUserRegistrationDeps {
   emailService: EmailService;
