@@ -8,6 +8,9 @@ import { acceptOrder } from "./accept-order.js";
 import { MockedStockService } from "../../services/mocks/mock-stock-service.js";
 import { stockMock } from "../../entities/mocks/stock-mock.js";
 import { orderMock } from "../../entities/mocks/order-mock.js";
+import { MockedEmailService } from "../../services/mocks/mock-email-service.js";
+import { MockedUserService } from "../../services/mocks/mock-user-service.js";
+import { userMock } from "../../entities/mocks/user-mock.js";
 
 describe("acceptOrder", () => {
   const orderService = new MockedOrderService([
@@ -85,14 +88,16 @@ describe("acceptOrder", () => {
     }),
   ]);
 
+  const emailService = new MockedEmailService();
+  const userService = new MockedUserService([userMock({ id: "user-1", email: "prueba@gmail.com"})]);
   // -------------------------
   // TESTS
   // -------------------------
 
   test("if state order is not 'pending' return error", async () => {
     const result = await acceptOrder(
-      { orderService, productService, variantService, stockService },
-      { orderId: "order-2" }
+      { orderService, productService, variantService, stockService, emailService, userService },
+      { orderId: "order-2", userId: "user-1" }
     );
 
     expect(result).toStrictEqual(Error("Order not in pending state"));
@@ -102,8 +107,8 @@ describe("acceptOrder", () => {
     const productService = new MockedProductService([]);
 
     const result = await acceptOrder(
-      { orderService, productService, variantService, stockService },
-      { orderId: "order-1" }
+      { orderService, productService, variantService, stockService, emailService, userService },
+      { orderId: "order-1", userId: "user-1" }
     );
 
     expect(result).toStrictEqual(Error("Product p1 not found"));
@@ -113,8 +118,8 @@ describe("acceptOrder", () => {
     const variantService = new MockedVariantService([]);
 
     const result = await acceptOrder(
-      { orderService, productService, variantService, stockService },
-      { orderId: "order-1" }
+      { orderService, productService, variantService, stockService, emailService, userService },
+      { orderId: "order-1", userId: "user-1"}
     );
 
     expect(result).toStrictEqual(Error("Variant Variant-1 not found"));
@@ -124,8 +129,8 @@ describe("acceptOrder", () => {
     const stockService = new MockedStockService([]);
 
     const result = await acceptOrder(
-      { orderService, productService, variantService, stockService },
-      { orderId: "order-1" }
+      { orderService, productService, variantService, stockService, emailService, userService },
+      { orderId: "order-1", userId: "user-1" }
     );
 
     expect(result).toStrictEqual(
@@ -143,8 +148,8 @@ describe("acceptOrder", () => {
     ]);
 
     const result = await acceptOrder(
-      { orderService, productService, variantService, stockService },
-      { orderId: "order-1" }
+      { orderService, productService, variantService, stockService, emailService, userService },
+      { orderId: "order-1", userId: "user-1" }
     );
 
     expect(result).toStrictEqual(
@@ -152,34 +157,44 @@ describe("acceptOrder", () => {
     );
   });
 
-  test("should verify products and variant and change state to ACCEPTED", async () => {
+  test("SUCCES CASE - should verify products and variant and decrease it, change state to ACCEPTED and notify", async () => {
     const result = await acceptOrder(
-      { orderService, productService, variantService, stockService },
-      { orderId: "order-1" }
+      { orderService, productService, variantService, stockService, emailService, userService },
+      { orderId: "order-1", userId: "user-1" }
     );
 
     if (result instanceof Error) throw result;
 
     expect(result.state).toBe("accepted");
+    expect(emailService.sent.length).toBe(1);
+    expect(emailService.sent[0]).toMatchObject({
+      to: "prueba@gmail.com",
+      subject: "Actualización del estado de tu orden",
+    });
   });
 
-  test("success case without variant → uses product stock", async () => {
+  test("SUCCES CASE - without variant → uses product stock - should verify products and variant and decrease it, change state to ACCEPTED and notify", async () => {
     const result = await acceptOrder(
-      { orderService, productService, variantService, stockService },
-      { orderId: "order-3" }
+      { orderService, productService, variantService, stockService, emailService, userService },
+      { orderId: "order-3", userId: "user-1" }
     );
 
     if (result instanceof Error) throw result;
 
     expect(result.state).toBe("accepted");
+    expect(emailService.sent.length).toBe(2);
+    expect(emailService.sent[0]).toMatchObject({
+      to: "prueba@gmail.com",
+      subject: "Actualización del estado de tu orden",
+    });
   });
 
   test("should return error when order not found", async () => {
     const orderService = new MockedOrderService([]);
 
     const result = await acceptOrder(
-      { orderService, productService, variantService, stockService },
-      { orderId: "order-1" }
+      { orderService, productService, variantService, stockService, emailService, userService },
+      { orderId: "order-1", userId: "user-1" }
     );
 
     expect(result).toStrictEqual(Error("Order not found"));

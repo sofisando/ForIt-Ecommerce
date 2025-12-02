@@ -5,27 +5,34 @@ import { Order, OrderState } from "../../entities/order.js";
 import { StockService } from "../../services/stock-service.js";
 import { decreaseStockForVariant } from "../stock/decrease-stock-for-variant.js";
 import { decreaseStockForProduct } from "../stock/decrease-stock-for-product.js";
+import type { UserService } from "../../services/user-service.js";
+import type { EmailService } from "../../services/email-service.js";
+import type { User } from "../../entities/user.js";
+import { notifyUpdateStateOrder } from "../email/notify-update-state-order.js";
 
 interface AcceptOrderDeps {
   orderService: OrderService;
   productService: ProductService;
   stockService: StockService;
   variantService: VariantService;
+  userService: UserService;
+  emailService: EmailService;
 }
 
 interface AcceptOrderPayload {
   orderId: Order["id"];
+  userId: User["id"];
 }
 
 export async function acceptOrder(
-  {
-    orderService,
-    productService,
-    variantService,
-    stockService,
-  }: AcceptOrderDeps,
-  { orderId }: AcceptOrderPayload
+  { orderService, productService, variantService, stockService, emailService, userService }: AcceptOrderDeps,
+  { orderId, userId }: AcceptOrderPayload
 ) {
+
+  //verificar que el usuario exista
+  const user = await userService.findById(userId);
+  if (!user) return new Error(`User ${userId} not found`);
+
   const order = await orderService.findById(orderId);
   if (!order) return new Error("Order not found");
 
@@ -68,5 +75,12 @@ export async function acceptOrder(
   }
 
   // Finalmente, cambiar estado
-  return await orderService.updateStateOrder(order.id, OrderState.ACEPTED);
+  const aceptedOrder = await orderService.updateStateOrder(order.id, OrderState.ACEPTED);
+  // Mandar notificacion por email
+    await notifyUpdateStateOrder(
+      { emailService, orderService },
+      { userEmail: user.email , orderId: order.id , state: OrderState.ACEPTED}
+    );
+
+  return aceptedOrder;
 }
