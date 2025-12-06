@@ -10,6 +10,9 @@ describe("updateProductQuantity", async () => {
       products: [
         {
           productId: "productId1",
+          name: "Laptop",
+          price: 2000,
+          categoryId: "category1",
           variantId: "variantId1",
           discountApplied: undefined,
           quantity: 2,
@@ -17,6 +20,9 @@ describe("updateProductQuantity", async () => {
         },
         {
           productId: "productId2",
+          name: "Mouse",
+          price: 500,
+          categoryId: "category2",
           variantId: "variantId2",
           discountApplied: undefined,
           quantity: 3,
@@ -45,6 +51,9 @@ describe("updateProductQuantity", async () => {
       products: [
         {
           productId: "productId1",
+          name: "Laptop",
+          price: 2000,
+          categoryId: "category1",
           variantId: "variantId1",
           discountApplied: undefined,
           quantity: 2,
@@ -52,6 +61,9 @@ describe("updateProductQuantity", async () => {
         },
         {
           productId: "productId2",
+          name: "Mouse",
+          price: 500,
+          categoryId: "category2",
           variantId: "variantId2",
           discountApplied: undefined,
           quantity: 7,

@@ -10,6 +10,9 @@ describe("removeProductFromCart", async () => {
       products: [
         {
           productId: "productId1",
+          name: "Laptop",
+          price: 1500,
+          categoryId: "category1",
           variantId: "variantId1",
           discountApplied: undefined,
           quantity: 2,
@@ -17,6 +20,9 @@ describe("removeProductFromCart", async () => {
         },
         {
           productId: "productId2",
+          name: "Mouse",
+          price: 500,
+          categoryId: "category2",
           variantId: "variantId2",
           discountApplied: undefined,
           quantity: 3,
@@ -44,6 +50,9 @@ describe("removeProductFromCart", async () => {
       products: [
         {
           productId: "productId1",
+          name: "Laptop",
+          price: 1500,
+          categoryId: "category1",
           variantId: "variantId1",
           discountApplied: undefined,
           quantity: 2,
