@@ -5,12 +5,19 @@ interface ApplyDiscountsDeps {
   discountService: DiscountService;
 }
 
-export type WithDiscountApplied<T> = T & {
+type BaseProductForDiscount = {
+  categoryId: string;
+  id?: string;
+  productId?: string;
+};
+
+// Enriquecer el tipo con discountApplied
+export type WithDiscountApplied<P extends BaseProductForDiscount> = P & {
   discountApplied: DiscountInCart | undefined;
 };
 
 function matchDiscount(
-  product: { id?: string; productId?: string; categoryId: string },
+  product: BaseProductForDiscount,
   discounts: Discount[]
 ): DiscountInCart | undefined {
   const targetId = product.id ?? product.productId;
@@ -31,15 +38,22 @@ function matchDiscount(
   };
 }
 
-/**
- * Ahora funciona tanto para Product como para ProductInCart.
- */
-export async function applyDiscountsToProducts<
-  P extends { categoryId: string; id?: string; productId?: string }
->(
+// 🔹 Overloads
+export function applyDiscountsToProducts<P extends BaseProductForDiscount>(
+  deps: ApplyDiscountsDeps,
+  products: P
+): Promise<WithDiscountApplied<P>>;
+
+export function applyDiscountsToProducts<P extends BaseProductForDiscount>(
+  deps: ApplyDiscountsDeps,
+  products: P[]
+): Promise<WithDiscountApplied<P>[]>;
+
+// 🔹 Implementación
+export async function applyDiscountsToProducts<P extends BaseProductForDiscount>(
   { discountService }: ApplyDiscountsDeps,
   products: P | P[]
-): Promise<WithDiscountApplied<P>[] | WithDiscountApplied<P>> {
+): Promise<WithDiscountApplied<P> | WithDiscountApplied<P>[]> {
   const list = Array.isArray(products) ? products : [products];
 
   const activeDiscounts = await discountService.getActiveDiscounts();
@@ -47,7 +61,7 @@ export async function applyDiscountsToProducts<
   const enriched = list.map((p) => ({
     ...p,
     discountApplied: matchDiscount(p, activeDiscounts),
-  }));
+  })) as WithDiscountApplied<P>[];
 
-  return (Array.isArray(products) ? enriched : enriched[0]) as any;
+  return Array.isArray(products) ? enriched : enriched[0] as any;
 }

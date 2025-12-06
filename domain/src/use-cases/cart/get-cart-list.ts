@@ -18,10 +18,10 @@ export async function getCartList({
   if (!carts) throw new Error("There are not carts");
 
   const enrichedCarts = carts.map(async (c) => {
-    const enrichedProducts = (await applyDiscountsToProducts(
+    const enrichedProducts = await applyDiscountsToProducts(
       { discountService },
       c.products
-    )) as ProductInCart[];
+    );
 
     const updatedCart: Cart = {
       ...c,
@@ -33,7 +33,7 @@ export async function getCartList({
 
     // Recalcular total
     const withTotals = calculateCartTotal(withSubtotals);
-    return withTotals
+    return withTotals;
   });
 
   return enrichedCarts;
