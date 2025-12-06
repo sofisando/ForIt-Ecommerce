@@ -1,20 +1,29 @@
-import { Category } from "../../entities/category";
-import { CategoryService } from "../../services/category-service";
-import { UpdatePayload } from "../../utils/types/payload";
+import { User, UserRole } from "../../entities";
+import type { Category } from "../../entities/category";
+import type { CategoryService, UserService } from "../../services";
+import type { UpdatePayload } from "../../utils/types/payload";
 
 interface EditCategoryDeps {
   categoryService: CategoryService;
+  userService: UserService;
 }
 
-type EditCategoryPayload = UpdatePayload<Category>;
+type EditCategoryPayload = {
+  userId: User["id"];
+  data: UpdatePayload<Category>;
+};
 
 export async function editCategory(
-  { categoryService }: EditCategoryDeps,
-  payload: EditCategoryPayload
-): Promise<Category> {
-  const existing = await categoryService.findById(payload.id);
-  if (!existing) throw new Error("Category not found");
+  { categoryService, userService }: EditCategoryDeps,
+  { userId, data }: EditCategoryPayload
+): Promise<Category | Error> {
+  const user = await userService.findById(userId);
+  if (!user) return new Error(`User ${userId} not found`);
 
-  const updated = await categoryService.editOne(payload);
+  if (user.role !== UserRole.ADMIN) return new Error(`User is not ${UserRole.ADMIN}`);
+  const existing = await categoryService.findById(data.id);
+  if (!existing) return  new Error("Category not found");
+
+  const updated = await categoryService.editOne(data);
   return updated;
 }
