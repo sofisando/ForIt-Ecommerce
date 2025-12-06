@@ -30,6 +30,7 @@ describe("createOrder", () => {
       products: [
         {
           productId: "p1",
+          categoryId: "category-1",
           name: "Laptop",
           price: 1000,
           discountApplied: undefined,
@@ -90,6 +91,7 @@ describe("createOrder", () => {
       products: [
         {
           productId: "p1",
+          categoryId: "category-1",
           name: "Laptop",
           price: 1000,
           discountApplied: undefined,
@@ -129,6 +131,7 @@ describe("createOrder", () => {
       products: [
         {
           productId: "p1",
+          categoryId: "category-1",
           name: "Laptop",
           price: 1000,
           discountApplied: undefined,
