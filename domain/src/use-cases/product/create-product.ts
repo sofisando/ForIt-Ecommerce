@@ -1,17 +1,30 @@
-import { Product } from "../../entities";
-import { ProductService } from "../../services";
-import { CreatePayload } from "../../utils/types/payload";
+import { Product, User, UserRole } from "../../entities";
+import type { ProductService, UserService } from "../../services";
+import type { CreatePayload } from "../../utils/types/payload";
 
 interface CreateProductDeps {
   productService: ProductService;
+  userService: UserService;
 }
 
-type CreateProductPayload = CreatePayload<Product>;
+type CreateProductPayload = {
+  userId: User["id"];        // solo para validar
+  data: CreatePayload<Product>; // datos reales del producto
+};
 
 export async function createProduct(
-  { productService }: CreateProductDeps,
+  { productService, userService }: CreateProductDeps,
   payload: CreateProductPayload
-): Promise<Product> {
-  const product = await productService.create(payload);
+): Promise<Product | Error> {
+  
+  // 1. Verificás user
+  const user = await userService.findById(payload.userId);
+  if (!user) return new Error(`User ${payload.userId} not found`);
+
+  if (user.role !== UserRole.ADMIN) {
+    return new Error(`User is not ${UserRole.ADMIN}`);
+  }
+  // 2. Creás el producto con los datos que corresponden
+  const product = await productService.create(payload.data);
   return product;
 }

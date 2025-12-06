@@ -2,7 +2,8 @@ import { describe, expect, test } from "vitest";
 import { MockedProductService } from "../../services/mocks/mock-product-service";
 import { productMock } from "../../entities/mocks/product-mock";
 import { createProduct } from "./create-product";
-import { Variant } from "../../entities/variant";
+import { MockedUserService } from "../../services/mocks/mock-user-service";
+import { userMock } from "../../entities/mocks/user-mock";
 
 describe("createProduct", async () => {
   const productService = new MockedProductService([
@@ -13,20 +14,25 @@ describe("createProduct", async () => {
       imageUrl: "http://example.com/existing-product.jpg",
       name: "Mouse",
       price: 49.99,
-      variants: [],
     }),
+  ]);
+  const userService = new MockedUserService([
+    userMock({ id: "user-1", role: "ADMIN" }),
+    userMock({ id: "user-2", role: "CLIENT" }),
   ]);
 
   test("should create a new product", async () => {
     const result = await createProduct(
-      { productService },
+      { productService, userService },
       {
-        categoryId: crypto.randomUUID(),
-        description: "new product",
-        imageUrl: "http://example.com/other-product.jpg",
-        name: "Laptop",
-        price: 8000.0,
-        variants: [],
+        userId: "user-1",
+        data: {
+          categoryId: crypto.randomUUID(),
+          description: "new product",
+          imageUrl: "http://example.com/other-product.jpg",
+          name: "Laptop",
+          price: 8000.0,
+        },
       }
     );
 
@@ -38,40 +44,42 @@ describe("createProduct", async () => {
       imageUrl: "http://example.com/other-product.jpg",
       name: "Laptop",
       price: 8000.0,
-      variants: [],
     });
     expect(result).toStrictEqual(productService.products[1]);
   });
 
-  test("should create a new product with variants", async () => {
-    const categoryId = crypto.randomUUID();
-    const variants: Variant[] = [
-      { id: crypto.randomUUID(), attribute: "Color: Black" },
-      { id: crypto.randomUUID(), attribute: "Size: Large" },
-    ];
-
+  test("should return error when user not found", async () => {
     const result = await createProduct(
-      { productService },
+      { productService, userService },
       {
-        categoryId,
-        description: "product with variants",
-        imageUrl: "http://example.com/product-with-variants.jpg",
-        name: "Headphones",
-        price: 3000.0,
-        variants,
+        userId: "user-999",
+        data: {
+          categoryId: crypto.randomUUID(),
+          description: "new product",
+          imageUrl: "http://example.com/other-product.jpg",
+          name: "Laptop",
+          price: 8000.0,
+        },
       }
     );
 
-    expect(productService.products).toHaveLength(3);
-    expect(productService.products[2]).toStrictEqual({
-      id: expect.any(String),
-      categoryId,
-      description: "product with variants",
-      imageUrl: "http://example.com/product-with-variants.jpg",
-      name: "Headphones",
-      price: 3000.0,
-      variants,
-    });
-    expect(result).toStrictEqual(productService.products[2]);
+    expect(result).toStrictEqual(Error("User user-999 not found"))
   });
+
+  test("Should return error if user is not ADMIN", async () => {
+     const result = await createProduct(
+      { productService, userService },
+      {
+        userId: "user-2",
+        data: {
+          categoryId: crypto.randomUUID(),
+          description: "new product",
+          imageUrl: "http://example.com/other-product.jpg",
+          name: "Laptop",
+          price: 8000.0,
+        },
+      }
+    );
+      expect(result).toStrictEqual(Error("User is not ADMIN"))
+    });
 });

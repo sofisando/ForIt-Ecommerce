@@ -1,19 +1,29 @@
-import { Product } from "../../entities";
-import { ProductService } from "../../services";
-import { DeletePayload } from "../../utils/types/payload";
+import { Product, User, UserRole } from "../../entities";
+import type { ProductService, UserService } from "../../services";
+import type { DeletePayload } from "../../utils/types/payload";
 
 interface DeleteProductDeps {
   productService: ProductService;
+  userService: UserService;
 }
 
-type DeleteProductPayload = DeletePayload<Product>
+type DeleteProductPayload = DeletePayload<Product> & {
+  userId: User["id"];
+};
 
 export async function deleteProduct(
-  { productService }: DeleteProductDeps,
-  { id }: DeleteProductPayload
-) : Promise<void> {
-  const foundProduct = await productService.findById(id);
-  if (!foundProduct) throw new Error("Product not found");
+  { productService, userService }: DeleteProductDeps,
+  { id, userId }: DeleteProductPayload
+): Promise<void | Error> {
+  const user = await userService.findById(userId);
+  if (!user) return new Error(`User ${userId} not found`);
 
-  await productService.delete({id});
+  if (user.role !== UserRole.ADMIN) {
+    return new Error(`User is not ${UserRole.ADMIN}`);
+  }
+
+  const foundProduct = await productService.findById(id);
+  if (!foundProduct) return new Error("Product not found");
+
+  await productService.delete({ id });
 }
