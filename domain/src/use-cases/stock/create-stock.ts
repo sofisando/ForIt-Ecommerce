@@ -1,28 +1,54 @@
-import { Stock } from "../../entities/stock.js";
-import { StockService } from "../../services/stock-service.js";
-
+import type { Stock } from "../../entities/stock.js";
+import { User, UserRole } from "../../entities/user.js";
+import type { StockService, UserService } from "../../services";
 import type { CreatePayload } from "../../utils/types/payload.js";
+import type { StockIdSelector } from "../../utils/types/stockIdSelector.js";
 
 interface CreateStockDeps {
   stockService: StockService;
+  userService: UserService;
 }
 
-type CreateStockPayload = CreatePayload<Stock>;
+type CreateStockPayload = {
+  userId: User["id"];
+  data: CreatePayload<Omit<Stock, "productId" | "variantId">> & StockIdSelector;
+};
+
 
 export async function createStock(
-  { stockService }: CreateStockDeps,
-  payload: CreateStockPayload
+  { stockService, userService }: CreateStockDeps,
+  { userId, data }: CreateStockPayload
 ): Promise<Stock | Error> {
-  if (payload.variantId) {
-    const found = await stockService.getByVariantAndBranch(payload.variantId, payload.branchId);
-    if (found) return new Error(`This variant: ${payload.variantId} is already created in this branch: ${payload.branchId}`);
+  const user = await userService.findById(userId);
+  if (!user) return new Error(`User ${userId} not found`);
+
+  if (user.role !== UserRole.ADMIN) {
+    return new Error(`User is not ${UserRole.ADMIN}`);
+  }
+  
+  if (data.variantId) {
+    const found = await stockService.getByVariantAndBranch(
+      data.variantId,
+      data.branchId
+    );
+    if (found)
+      return new Error(
+        `This variant: ${data.variantId} is already created in this branch: ${data.branchId}`
+      );
   }
 
-  if (payload.productId) {
-    const found = await stockService.getByProductAndBranch(payload.productId, payload.branchId);
-    if (found) return new Error(`This product: ${payload.productId} already has stock in branch: ${payload.branchId}`);
+  if (data.productId) {
+    const found = await stockService.getByProductAndBranch(
+      data.productId,
+      data.branchId
+    );
+    if (found)
+      return new Error(
+        `This product: ${data.productId} already has stock in branch: ${data.branchId}`
+      );
   }
-  const stock = await stockService.create(payload);
+  
+  const stock = await stockService.create(data as unknown as CreatePayload<Stock>);
 
   return stock;
 }
