@@ -51,6 +51,7 @@ export function orderMock(opts?: Partial<Order>): Order {
     id: crypto.randomUUID(),
     userId: crypto.randomUUID(),
     products,
+    branchId: null,
     total: products.reduce((sum, p) => sum + p.subtotal, 0),
     state: faker.helpers.arrayElement(Object.values(OrderState)),
     date: faker.date.recent({ days: 5 }),
