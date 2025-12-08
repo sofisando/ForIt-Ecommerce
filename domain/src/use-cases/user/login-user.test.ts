@@ -14,8 +14,7 @@ describe("loginUser", () => {
   test("Should login the user with correct credentials", async () => {
     const result = await loginUser(
       { userService, authService },
-      "prueba@gmail.com",
-      "securepassword"
+      { email: "prueba@gmail.com", password: "securepassword" }
     );
 
     expect(result).toBeDefined();
@@ -25,8 +24,7 @@ describe("loginUser", () => {
   test("Should return null if email does not exist", async () => {
     const result = await loginUser(
       { userService, authService },
-      "noexiste@gmail.com",
-      "1234"
+      { email: "noexiste@gmail.com", password: "1234" }
     );
 
     expect(result).toBeNull();
@@ -35,8 +33,7 @@ describe("loginUser", () => {
   test("Should return null if password is invalid", async () => {
     const result = await loginUser(
       { userService, authService },
-      "prueba@gmail.com",
-      "wrongpassword"
+      { email: "prueba@gmail.com", password: "wrongpassword" }
     );
 
     expect(result).toBeNull();
