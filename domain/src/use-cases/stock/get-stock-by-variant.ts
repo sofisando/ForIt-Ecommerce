@@ -1,3 +1,4 @@
+import { Stock } from "../../entities/stock";
 import { StockService } from "../../services/stock-service";
 
 interface GetStockByVariantDeps {
@@ -8,10 +9,10 @@ interface GetStockByVariantPayload {
   variantId: string;
 }
 
-export const getStockByVariant = async (
-  {stockService}: GetStockByVariantDeps,
-  {variantId}: GetStockByVariantPayload
-) => {
+export async function getStockByVariant(
+  { stockService }: GetStockByVariantDeps,
+  { variantId }: GetStockByVariantPayload
+): Promise<Stock[]> {
   const stock = await stockService.getByVariantId(variantId);
   return stock;
 };
