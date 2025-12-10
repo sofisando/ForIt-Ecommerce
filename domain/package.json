@@ -1,11 +1,13 @@
 {
-  "name": "domain",
+  "name": "@forit/domain",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "npx tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.build.json",
     "test": "vitest"
   },
+  
   "keywords": [],
   "author": "",
   "license": "ISC",
