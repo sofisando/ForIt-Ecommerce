@@ -22,7 +22,7 @@ model User{
   name String
   DNI String
   email String @unique
-  password String //en realidad hay que guardar el hash
+  password String
   role UserRole
 }
 
@@ -30,6 +30,7 @@ model Category{
   id   String @id @default(uuid())
   name String
   products Product[]
+  discounts Discount[] @relation("DiscountCategories")
 }
 
 model Product{
@@ -41,6 +42,7 @@ model Product{
   categoryId String
   category Category @relation(fields: [categoryId], references: [id])
   variants Variant[]
+  discounts Discount[] @relation("DiscountProducts")
 }
 
 model Variant {
@@ -54,3 +56,20 @@ model Variant {
   @@index([productId])
 }
 
+enum DiscountType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
+model Discount{
+  id     String  @id @default(uuid())
+  name String
+  type DiscountType
+  value Int
+  active Boolean
+  dateFrom DateTime
+  dateTo DateTime
+
+  products   Product[]   @relation("DiscountProducts")
+  categories Category[]  @relation("DiscountCategories")
+}
