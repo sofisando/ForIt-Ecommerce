@@ -38,7 +38,7 @@ model Product{
   name String
   description String
   imageUrl String
-  price Int
+  price Decimal
   categoryId String
   category Category @relation(fields: [categoryId], references: [id])
   variants Variant[]
@@ -72,4 +72,40 @@ model Discount{
 
   products   Product[]   @relation("DiscountProducts")
   categories Category[]  @relation("DiscountCategories")
+}
+
+// ponemos los datos que se guardan, como esten o como se representen seria el DTO
+enum OrderState {
+  PENDING
+  ACEPTED
+  READY
+  CANCELED
+  DELIVERED
+}
+
+model Order {
+  id        String      @id @default(uuid())
+  userId    String
+  branchId  String?
+  total     Decimal
+  state     OrderState
+  date      DateTime    @default(now())
+
+  items     OrderItem[]
+}
+
+model OrderItem {
+  id        String   @id @default(uuid())
+  orderId  String
+  order    Order    @relation(fields: [orderId], references: [id])
+
+  productId String
+  name      String
+  price     Decimal
+  quantity  Int
+  subtotal  Decimal
+
+  // snapshots embebidos
+  variant   Json?
+  discount  Json?
 }

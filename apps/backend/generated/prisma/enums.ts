@@ -15,3 +15,22 @@ export const UserRole = {
 } as const
 
 export type UserRole = (typeof UserRole)[keyof typeof UserRole]
+
+
+export const DiscountType = {
+  PERCENTAGE: 'PERCENTAGE',
+  FIXED_AMOUNT: 'FIXED_AMOUNT'
+} as const
+
+export type DiscountType = (typeof DiscountType)[keyof typeof DiscountType]
+
+
+export const OrderState = {
+  PENDING: 'PENDING',
+  ACEPTED: 'ACEPTED',
+  READY: 'READY',
+  CANCELED: 'CANCELED',
+  DELIVERED: 'DELIVERED'
+} as const
+
+export type OrderState = (typeof OrderState)[keyof typeof OrderState]

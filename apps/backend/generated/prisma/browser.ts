@@ -32,3 +32,23 @@ export type Category = Prisma.CategoryModel
  * 
  */
 export type Product = Prisma.ProductModel
+/**
+ * Model Variant
+ * 
+ */
+export type Variant = Prisma.VariantModel
+/**
+ * Model Discount
+ * 
+ */
+export type Discount = Prisma.DiscountModel
+/**
+ * Model Order
+ * 
+ */
+export type Order = Prisma.OrderModel
+/**
+ * Model OrderItem
+ * 
+ */
+export type OrderItem = Prisma.OrderItemModel
