@@ -6,7 +6,7 @@ import type { User } from "./user.js";
 import type { Variant } from "./variant.js";
 
 export interface ProductInCart {
-  productId: Product["id"];
+  productId: Product["id"]; //siempre dejar el id del producto, por mas que tenga variante
   categoryId: Category["id"];
   name: string;
   price: number;

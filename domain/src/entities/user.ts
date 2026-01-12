@@ -11,7 +11,7 @@ export interface User extends Entity {
     name: string;
     DNI: string;
     email: string;
-    password: string; //en realidad hay que guardar el hash
+    password: string;
     role: UserRole;
 }
 
