@@ -1,0 +1,16 @@
+preguntar por las dependencias que se llaman una sola vez... es un estilo, lo tengo anotado en notion
+
+los mensajes de error
+
+
+---------------------------------
+
+body para crear producto -- endpoint createProduct
+{
+  "userId": "38475932875",
+  "name": "PRODUCTAZO",
+  "description": "PEDAZO PRODUCTAZO",
+  "imageUrl": "mansaimg",
+  "price": 40000,
+  "categoryId": "1151893f-ee97-43c8-94b8-9632ce6ffdaf"
+}
