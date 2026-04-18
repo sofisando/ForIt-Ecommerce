@@ -4,7 +4,7 @@ export * from "./category-service.js";
 export * from "./discount-service.js";
 export * from "./email-service.js";
 export * from "./order-service.js";
-export * from "./product-service.js";
+export * from "./product-repository.js";
 export * from "./stock-service.js";
 export * from "./user-service.js";
 export * from "./variant-service.js";

@@ -1,39 +1,40 @@
 import { Entity } from "../utils/types/entity";
 
 export class Product extends Entity {
-  private _name: string;
-  private _description: string;
-  private _imageUrl: string;
-  private _price: number;
-  private _categoryId: string;
+  constructor(
+    id: string,
+    private _name: string,
+    private _description: string,
+    private _imageUrl: string,
+    private _price: number,
+    private _categoryId: string,
+    //se utiliza con _ porque sino da conflicto con el getter, para mantener el encapsulamiento se maneja con _
+  ) {
+    super(id);
 
-  constructor(params: {
-    id: string;
-    name: string;
-    description: string;
-    imageUrl: string;
-    price: number;
-    categoryId: string;
-  }) {
-    super(params.id);
-
-    if (params.price <= 0) {
+    if (_price <= 0) {
       throw new Error("Product price must be greater than zero");
     }
 
-    if (!params.name.trim()) {
+    if (!_name.trim()) {
       throw new Error("Product name is required");
     }
-
-    this._name = params.name;
-    this._description = params.description;
-    this._imageUrl = params.imageUrl;
-    this._price = params.price;
-    this._categoryId = params.categoryId;
   }
 
+  get name() {
+    return this._name;
+  }
+  get description() {
+    return this._description;
+  }
+  get imageUrl() {
+    return this._imageUrl;
+  }
   get price() {
     return this._price;
+  }
+  get categoryId() {
+    return this._categoryId;
   }
 
   changePrice(newPrice: number) {
