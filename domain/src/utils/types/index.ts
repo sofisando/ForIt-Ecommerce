@@ -1,3 +1,2 @@
 export * from './entity';
-export * from './payload';
-export * from './service';
+export * from './repository';

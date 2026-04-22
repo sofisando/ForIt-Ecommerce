@@ -1,18 +1,39 @@
 import { prisma } from './lib/prisma.js'
 
 async function main() {
-    const newUser = await prisma.user.create({
+    // acordarse de activar el servicio de postgres antes de ejecutar el test "sudo systemctl start postgresql"
+    // ejecutar con: npm run test:db
+    //recordar cambiar los datos cada vez que se quiera hacer la prueba para no tener conflictos de email unico
+    
+    // const newUser = await prisma.user.create({
+    //     data: {
+    //         name: "pablitoLescano",
+    //         DNI: "123405677",
+    //         email: "PablitoLescanito@gmail.com",
+    //         password: "recontraSecret",
+    //         role: "ADMIN"
+    //     }
+    // })
+    // console.log(newUser)
+
+    // const newCategory = await prisma.category.create({
+    //     data: {
+    //         name: "Categoria de prueba",
+    //         products: {}
+    //     }
+    // })
+    // console.log(newCategory)
+
+    const newProduct = await prisma.product.create({
         data: {
-            // ejecutar con: npm run test:db
-            //recordar cambiar los datos cada vez que se quiera hacer la prueba para no tener conflictos de email unico
-            name: "PEpito",
-            DNI: "123455677",
-            email: "Pep2@gmail.com",
-            password: "reSecret",
-            role: "ADMIN"
+            name: "Producto de prueba",
+            description: "Este es un producto de prueba",
+            imageUrl: "example.png",
+            price: 1500.00,
+            categoryId: "bbf7349c-f0a5-43f6-bd7e-d752c8839712",
         }
     })
-    console.log(newUser)
+    console.log(newProduct)
 }
 
 main()

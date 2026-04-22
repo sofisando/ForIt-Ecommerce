@@ -1,12 +1,47 @@
-import type { Entity } from "../utils/types/entity";
-import type { Product } from "./product";
-import type { Variant } from "./variant";
+import { Entity } from "../utils/types/entity";
 
-export interface Stock extends Entity {
-  productId?: Product['id'];
-  variantId?: Variant['id'];
-  branchId: string | null; // null si no hay sucursales todavía
-  quantity: number;
+export class Stock extends Entity {
+  private constructor(
+    id: string,
+    public readonly branchId: string | null,
+    public readonly quantity: number,
+    public readonly productId?: string,
+    public readonly variantId?: string,
+  ) {
+    super(id);
+
+    if (quantity < 0) {
+      throw new Error("Stock quantity cannot be negative");
+    }
+  }
+
+  static forProduct(params: {
+    id: string;
+    productId: string;
+    branchId: string | null;
+    quantity: number;
+  }): Stock {
+    return new Stock(
+      params.id,
+      params.branchId,
+      params.quantity,
+      params.productId,
+      undefined
+    );
+  }
+
+  static forVariant(params: {
+    id: string;
+    variantId: string;
+    branchId: string | null;
+    quantity: number;
+  }): Stock {
+    return new Stock(
+      params.id,
+      params.branchId,
+      params.quantity,
+      undefined,
+      params.variantId
+    );
+  }
 }
-
-// ❗ Regla del dominio: Un stock debe tener o productId o variantId, pero no ambos al mismo tiempo.
