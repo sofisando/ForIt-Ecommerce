@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Product, ProductRepository } from "@forit/domain";
-import { Product as PrismaProduct } from "@prisma/client";
+import { ProductMapper } from "./mappers/product-mapper.js"
 
 export class ProductRepositoryPrisma implements ProductRepository {
   private db: PrismaClient;
@@ -16,17 +16,17 @@ export class ProductRepositoryPrisma implements ProductRepository {
 
     if (!result) return null;
 
-    return this.toDomain(result);
+    return ProductMapper.toDomain(result);
   }
 
   async getAll(): Promise<Product[]> {
     const results = await this.db.product.findMany();
 
-    return results.map(this.toDomain);
+    return results.map(ProductMapper.toDomain);
   }
 
   async save(product: Product): Promise<void> {
-    const data = this.toPrisma(product);
+    const data = ProductMapper.toPrisma(product);
 
     await this.db.product.upsert({
       where: { id: product.id },
@@ -46,7 +46,7 @@ export class ProductRepositoryPrisma implements ProductRepository {
       where: { categoryId },
     });
 
-    return results.map(this.toDomain);
+    return results.map(ProductMapper.toDomain);
   }
 
   async getProductsSearch(query: string): Promise<Product[]> {
@@ -59,30 +59,6 @@ export class ProductRepositoryPrisma implements ProductRepository {
       },
     });
 
-    return results.map(this.toDomain);
-  }
-
-  // 🔥 MAPPERS
-
-  private toDomain(prismaProduct: PrismaProduct): Product {
-  return new Product(
-    prismaProduct.id,
-    prismaProduct.name,
-    prismaProduct.description,
-    prismaProduct.imageUrl,
-    prismaProduct.price,
-    prismaProduct.categoryId
-  );
-}
-
-  private toPrisma(product: Product) {
-    return {
-      id: product.id,
-      name: product.name,
-      description: product.description,
-      imageUrl: product.imageUrl,
-      price: product.price,
-      categoryId: product.categoryId,
-    };
+    return results.map(ProductMapper.toDomain);
   }
 }
