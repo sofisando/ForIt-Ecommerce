@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { ProductRepositoryPrisma } from "../../infra/repos/product-repo-implementation.js";
-import { prisma } from "../../lib/prisma.js";
+import { prisma } from "../../infra/prisma/prisma.js";
 import { CreateProductDTO } from "src/application/use-cases/DTOs/create-product.dto.js";
 import { createProduct } from "../../application/use-cases/create-product.js";
 

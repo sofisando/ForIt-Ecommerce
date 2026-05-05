@@ -24,11 +24,12 @@ model User{
   email String @unique
   password String
   role UserRole
+  // carts Cart[]
 }
 
 model Category{
   id   String @id @default(uuid())
-  name String
+  name String @unique
   products Product[]
   discounts Discount[] @relation("DiscountCategories")
 }
@@ -38,11 +39,12 @@ model Product{
   name String
   description String
   imageUrl String
-  price Decimal
+  price Decimal @db.Decimal(10, 2)
   categoryId String
   category Category @relation(fields: [categoryId], references: [id])
   variants Variant[]
   discounts Discount[] @relation("DiscountProducts")
+  // cartItems CartItem[]
 }
 
 model Variant {
@@ -109,3 +111,59 @@ model OrderItem {
   variant   Json?
   discount  Json?
 }
+
+// model Cart {
+//   id        String     @id @default(uuid())
+//   userId    String     @unique
+//   user      User       @relation(fields: [userId], references: [id])
+
+//   items     CartItem[]
+//   createdAt DateTime   @default(now())
+//   updatedAt DateTime   @updatedAt
+// }
+
+// model CartItem {
+//   id        String   @id @default(uuid())
+
+//   cartId   String
+//   cart     Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+//   productId String
+//   product   Product  @relation(fields: [productId], references: [id])
+
+//   variantId String?
+//   variant   Variant? @relation(fields: [variantId], references: [id])
+
+//   quantity  Int
+
+//   @@unique([cartId, productId, variantId])
+// }
+
+
+
+
+
+
+
+
+
+
+// model Stock {
+//   id        String   @id @default(uuid())
+
+//   productId String?
+//   product   Product? @relation(fields: [productId], references: [id])
+
+//   variantId String?
+//   variant   Variant? @relation(fields: [variantId], references: [id])
+
+//   branchId  String?
+//   quantity  Int
+
+//   @@check(
+//     (productId IS NOT NULL AND variantId IS NULL)
+//     OR
+//     (productId IS NULL AND variantId IS NOT NULL)
+//   )
+// }
+
