@@ -1,7 +1,8 @@
 // import { DiscountService, ProductService } from "../../services";
 // import { applyDiscountsToProducts } from "../../utils/functions/applyDiscountsToProducts";
+import { GetProductByIdDTO } from "@app/DTOs/index.js";
 import { ProductNotFoundError, type ProductRepository } from "@forit/domain";
-import { GetProductByIdDTO } from "./DTOs/getById-product.dto.js";
+
 
 interface GetProductByIdDeps {
   productRepository: ProductRepository;

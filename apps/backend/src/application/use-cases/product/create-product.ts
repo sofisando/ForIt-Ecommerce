@@ -1,7 +1,7 @@
 import { Product, UserRole } from "@forit/domain";
 import type { ProductRepository, UserRepository } from "@forit/domain";
 import { UserNotFoundError, UnauthorizedError } from "@forit/domain";
-import { CreateProductDTO } from "./DTOs/create-product.dto.js";
+import { CreateProductDTO } from "@app/DTOs/index.js";
 import { Money } from "@forit/domain/dist/ValueObjects/Money.js";
 
 interface CreateProductDeps {

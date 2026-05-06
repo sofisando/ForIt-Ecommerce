@@ -1,7 +1,8 @@
 // import { Product, User, UserRole } from "../../entities";
 // import type { ProductService, UserService } from "../../services";
 import { ProductNotFoundError, type ProductRepository } from "@forit/domain";
-import { DeleteProductDTO } from "./DTOs/delete-product.dto.js";
+import { DeleteProductDTO } from "@app/DTOs/index.js";
+
 
 interface DeleteProductDeps {
   productRepository: ProductRepository;

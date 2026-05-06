@@ -1,14 +1,9 @@
 import { Request, Response } from "express";
-import { ProductRepositoryPrisma } from "../../infra/repos/product-repo-implementation.js";
-import { prisma } from "../../infra/prisma/prisma.js";
-import { CreateProductDTO } from "src/application/use-cases/DTOs/create-product.dto.js";
-import { createProduct } from "../../application/use-cases/create-product.js";
-import { getAllProducts } from "src/application/use-cases/getAll-products.js";
-import { getProductById } from "src/application/use-cases/getById-product.js";
-import { GetProductByIdDTO } from "src/application/use-cases/DTOs/getById-product.dto.js";
+import { prisma } from "@infra/prisma/prisma.js";
 import { ProductNotFoundError } from "@forit/domain";
-import { DeleteProductDTO } from "src/application/use-cases/DTOs/delete-product.dto.js";
-import { deleteProduct } from "src/application/use-cases/delete-product.js";
+import { CreateProductDTO, DeleteProductDTO, GetProductByIdDTO } from "@app/DTOs/index.js";
+import { createProduct, deleteProduct, getAllProducts, getProductById } from "@app/use-cases/index.js";
+import { ProductRepositoryPrisma } from "@infra/repos/index.js";
 
 const db = prisma;
 const productRepository = new ProductRepositoryPrisma(db);

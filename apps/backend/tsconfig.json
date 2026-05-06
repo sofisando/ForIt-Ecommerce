@@ -5,7 +5,10 @@
     "outDir": "dist", //dice que lo que se compile lo guarde en la carpeta dist
     "rootDir": "src", //la raiz de los archivos fuente es la carpeta src
     "paths": {
-      "@domain": ["../../domain/dist/index.js"]
+      "@domain": ["../../domain/dist/index.js"],
+      "@app/*": ["src/application/*"],
+      "@infra/*": ["src/infra/*"],
+      "@presentation/*": ["src/presentation/*"]
     }
   },
   "include": ["src"], //incluye la carpeta src en la compilacion y lo mete en la carpeta dist

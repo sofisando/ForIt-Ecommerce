@@ -1,6 +1,6 @@
-import { PrismaClient } from '../generated/prisma/client.js'
+import { PrismaClient } from "@infra/generated/prisma/client.js";
 import { Product, ProductRepository } from "@forit/domain";
-import { ProductMapper } from "./mappers/product.mapper.js"
+import { ProductMapper } from '@infra/mappers/index.js';
 
 export class ProductRepositoryPrisma implements ProductRepository {
   private db: PrismaClient;
