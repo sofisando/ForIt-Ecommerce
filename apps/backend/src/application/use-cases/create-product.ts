@@ -2,6 +2,7 @@ import { Product, UserRole } from "@forit/domain";
 import type { ProductRepository, UserRepository } from "@forit/domain";
 import { UserNotFoundError, UnauthorizedError } from "@forit/domain";
 import { CreateProductDTO } from "./DTOs/create-product.dto.js";
+import { Money } from "@forit/domain/dist/ValueObjects/Money.js";
 
 interface CreateProductDeps {
   productRepository: ProductRepository;
@@ -25,7 +26,7 @@ export async function createProduct(
     dto.name,
     dto.description,
     dto.imageUrl,
-    dto.price,
+    new Money(dto.price),
     dto.categoryId
   );
 

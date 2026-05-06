@@ -1,5 +1,7 @@
 import { Product } from "@forit/domain";
-import { Product as PrismaProduct } from "@prisma/client";
+import { Money } from "@forit/domain/dist/ValueObjects/Money.js";
+import { Product as PrismaProduct } from "../../generated/prisma/client.js";
+import { Decimal } from "src/infra/generated/prisma/internal/prismaNamespace.js";
 
 export class ProductMapper {
   static toDomain(prismaProduct: PrismaProduct): Product {
@@ -8,7 +10,7 @@ export class ProductMapper {
       prismaProduct.name,
       prismaProduct.description,
       prismaProduct.imageUrl,
-      prismaProduct.price,
+      new Money(prismaProduct.price.toNumber()),
       prismaProduct.categoryId
     );
   }
@@ -19,7 +21,7 @@ export class ProductMapper {
       name: product.name,
       description: product.description,
       imageUrl: product.imageUrl,
-      price: product.price,
+      price: new Decimal(product.price.toNumber()),
       categoryId: product.categoryId,
     };
   }
