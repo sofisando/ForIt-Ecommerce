@@ -2,15 +2,15 @@
 //import { applyDiscountsToProducts } from "../../utils/functions/applyDiscountsToProducts";
 import type { ProductRepository } from "@forit/domain";
 
-interface GetProductListDeps {
+interface GetAllProductsDeps {
   productRepository: ProductRepository;
 //   discountService: DiscountService;
 }
 
-export async function getProductList({
+export async function getAllProducts({
   productRepository,
 //   discountService,
-}: GetProductListDeps) {
+}: GetAllProductsDeps) {
   const products = await productRepository.getAll();
 //   const productsWithDiscounts = applyDiscountsToProducts(
 //     { discountService },
