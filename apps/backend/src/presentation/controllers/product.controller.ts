@@ -7,6 +7,8 @@ import { getAllProducts } from "src/application/use-cases/getAll-products.js";
 import { getProductById } from "src/application/use-cases/getById-product.js";
 import { GetProductByIdDTO } from "src/application/use-cases/DTOs/getById-product.dto.js";
 import { ProductNotFoundError } from "@forit/domain";
+import { DeleteProductDTO } from "src/application/use-cases/DTOs/delete-product.dto.js";
+import { deleteProduct } from "src/application/use-cases/delete-product.js";
 
 const db = prisma;
 const productRepository = new ProductRepositoryPrisma(db);
@@ -66,6 +68,28 @@ export const getProductByIdController = async (req: Request, res: Response) => {
     }
     res.status(500).json({
       message: "Error fetching product",
+    });
+  }
+};
+
+export const deleteProductController = async (req: Request, res: Response) => {
+  if (!req.params.id) {
+    return res.status(400).json({ message: "Id is required" });
+  }
+  const dto: DeleteProductDTO = {
+    id: req.params.id,
+  };
+
+  try {
+    await deleteProduct({ productRepository }, dto);
+    res.status(204).send();
+  } catch (error: any) {
+    console.error(error);
+    if (error instanceof ProductNotFoundError) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    res.status(500).json({
+      message: "Error deleting product",
     });
   }
 };
