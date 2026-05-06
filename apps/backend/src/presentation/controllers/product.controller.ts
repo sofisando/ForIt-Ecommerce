@@ -29,3 +29,15 @@ export const createProductController = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const getAllProductsController = async (req: Request, res: Response) => {
+  try {
+    const products = await productRepository.getAll();
+    res.status(200).json(products);
+  } catch (error: any) {
+    console.error(error);
+    res.status(500).json({
+      message: "Error fetching products",
+    });
+  }
+};
