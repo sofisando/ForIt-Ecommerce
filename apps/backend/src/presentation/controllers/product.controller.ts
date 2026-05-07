@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { prisma } from "@infra/prisma/prisma.js";
 import { ProductNotFoundError } from "@forit/domain";
-import { CreateProductDTO, DeleteProductDTO, GetProductByIdDTO } from "@app/DTOs/index.js";
-import { createProduct, deleteProduct, getAllProducts, getProductById } from "@app/use-cases/index.js";
+import { CreateProductDTO, DeleteProductDTO, GetProductByIdDTO, UpdateProductDTO } from "@app/DTOs/index.js";
+import { createProduct, deleteProduct, getAllProducts, getProductById, updateProduct } from "@app/use-cases/index.js";
 import { ProductRepositoryPrisma } from "@infra/repos/index.js";
 
 const db = prisma;
@@ -85,6 +85,28 @@ export const deleteProductController = async (req: Request, res: Response) => {
     }
     res.status(500).json({
       message: "Error deleting product",
+    });
+  }
+};
+
+export const updateProductController = async (req: Request, res: Response) => {
+  if (!req.params.id) {
+    return res.status(400).json({ message: "Id is required" });
+  }
+
+  const id = req.params.id;
+  const dto: UpdateProductDTO = req.body;
+
+  try {
+    const updatedProduct = await updateProduct({ productRepository }, id, dto);
+    res.status(200).json(updatedProduct);
+  } catch (error: any) {
+    console.error(error);
+    if (error instanceof ProductNotFoundError) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    res.status(500).json({
+      message: "Error updating product",
     });
   }
 };
