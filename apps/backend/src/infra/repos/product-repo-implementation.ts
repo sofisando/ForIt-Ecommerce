@@ -43,24 +43,4 @@ export class ProductRepositoryPrisma implements ProductRepository {
     });
   }
 
-  async getProductsByCategory(categoryId: string): Promise<Product[]> {
-    const results = await this.db.product.findMany({
-      where: { categoryId },
-    });
-
-    return results.map(ProductMapper.toDomain);
-  }
-
-  async getProductsSearch(query: string): Promise<Product[]> {
-    const results = await this.db.product.findMany({
-      where: {
-        name: {
-          contains: query,
-          mode: "insensitive",
-        },
-      },
-    });
-
-    return results.map(ProductMapper.toDomain);
-  }
 }

@@ -1,8 +1,20 @@
 import { Request, Response } from "express";
 import { prisma } from "@infra/prisma/prisma.js";
 import { ProductNotFoundError } from "@forit/domain";
-import { CreateProductDTO, DeleteProductDTO, GetProductByIdDTO, GetProductsDTO, UpdateProductDTO } from "@app/DTOs/index.js";
-import { createProduct, deleteProduct, getProductById, getProducts, updateProduct } from "@app/use-cases/index.js";
+import {
+  CreateProductDTO,
+  DeleteProductDTO,
+  GetProductByIdDTO,
+  GetProductsDTO,
+  UpdateProductDTO,
+} from "@app/DTOs/index.js";
+import {
+  createProduct,
+  deleteProduct,
+  getProductById,
+  getProducts,
+  updateProduct,
+} from "@app/use-cases/index.js";
 import { ProductRepositoryPrisma } from "@infra/repos/index.js";
 
 const db = prisma;
@@ -32,14 +44,44 @@ export const createProductController = async (req: Request, res: Response) => {
 };
 
 export const getProductsController = async (req: Request, res: Response) => {
-  const dto: GetProductsDTO = req.query;
+  const dto: GetProductsDTO = {};
+
+  if (typeof req.query.search === "string") {
+    dto.search = req.query.search;
+  }
+
+  if (typeof req.query.categoryId === "string") {
+    dto.categoryId = req.query.categoryId;
+  }
+
+  if (typeof req.query.minPrice === "string") {
+    const minPrice = Number(req.query.minPrice);
+
+    if (!Number.isNaN(minPrice)) {
+      dto.minPrice = minPrice;
+    }
+  }
+
+  if (typeof req.query.maxPrice === "string") {
+    const maxPrice = Number(req.query.maxPrice);
+
+    if (!Number.isNaN(maxPrice)) {
+      dto.maxPrice = maxPrice;
+    }
+  }
+
   try {
-    const products = await getProducts({
-      productRepository,
-    }, dto);
+    const products = await getProducts(
+      {
+        productRepository,
+      },
+      dto,
+    );
+
     res.status(200).json(products);
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(error);
+
     res.status(500).json({
       message: "Error fetching products",
     });
