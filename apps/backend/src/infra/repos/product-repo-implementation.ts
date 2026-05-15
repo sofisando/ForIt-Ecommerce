@@ -19,8 +19,10 @@ export class ProductRepositoryPrisma implements ProductRepository {
     return ProductMapper.toDomain(result);
   }
 
-  async getAll(): Promise<Product[]> {
-    const results = await this.db.product.findMany();
+  async getAll(filters: any): Promise<Product[]> {
+    const results = await this.db.product.findMany({
+      where: filters,
+    });
 
     return results.map(ProductMapper.toDomain);
   }

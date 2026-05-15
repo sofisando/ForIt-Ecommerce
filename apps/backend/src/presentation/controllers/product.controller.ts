@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import { prisma } from "@infra/prisma/prisma.js";
 import { ProductNotFoundError } from "@forit/domain";
-import { CreateProductDTO, DeleteProductDTO, GetProductByIdDTO, UpdateProductDTO } from "@app/DTOs/index.js";
-import { createProduct, deleteProduct, getAllProducts, getProductById, updateProduct } from "@app/use-cases/index.js";
+import { CreateProductDTO, DeleteProductDTO, GetProductByIdDTO, GetProductsDTO, UpdateProductDTO } from "@app/DTOs/index.js";
+import { createProduct, deleteProduct, getProductById, getProducts, updateProduct } from "@app/use-cases/index.js";
 import { ProductRepositoryPrisma } from "@infra/repos/index.js";
 
 const db = prisma;
@@ -31,11 +31,12 @@ export const createProductController = async (req: Request, res: Response) => {
   }
 };
 
-export const getAllProductsController = async (req: Request, res: Response) => {
+export const getProductsController = async (req: Request, res: Response) => {
+  const dto: GetProductsDTO = req.query;
   try {
-    const products = await getAllProducts({
+    const products = await getProducts({
       productRepository,
-    });
+    }, dto);
     res.status(200).json(products);
   } catch (error: any) {
     console.error(error);
@@ -110,3 +111,45 @@ export const updateProductController = async (req: Request, res: Response) => {
     });
   }
 };
+
+// export const getProductsByCategoryController = async (req: Request, res: Response) => {
+//   if (!req.params.categoryId) {
+//     return res.status(400).json({ message: "Category is required" });
+//   }
+//   const dto: GetProductsByCategoryDTO = {
+//     categoryId: req.params.categoryId,
+//   };
+
+//   try {
+//     const products = await getProductsByCategory({ productRepository }, dto);
+//     res.status(200).json(products);
+//   } catch (error: any) {
+//     //poner el tipo de error de que no se encuentra la categoria, viene del usecase
+//     console.error(error);
+//     res.status(500).json({
+//       message: "Error fetching products by category",
+//     });
+//   }
+// };
+
+//en realidad tengo que usar el mismo endpoint que tre los productos
+
+// export const getProductsFilterController = async (req: Request, res: Response) => {
+//   const { categoryId } = req.query;
+
+//   try {
+//     const dto: GetProductsDTO = {
+//       categoryId: categoryId ? String(categoryId) : undefined,
+//     };
+
+//     const products = await getProducts({ productRepository }, dto);
+
+//     res.status(200).json(products);
+//   } catch (error: any) {
+//     console.error(error);
+
+//     res.status(500).json({
+//       message: "Error fetching products",
+//     });
+//   }
+// };
