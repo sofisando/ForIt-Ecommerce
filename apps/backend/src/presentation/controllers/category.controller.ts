@@ -2,9 +2,9 @@ import { Request, Response } from "express";
 import { prisma } from "@infra/prisma/prisma.js";
 
 import { CategoryRepositoryPrisma } from "@infra/repos/index.js";
-import { CreateCategoryDTO, GetCategoryDTO, UpdateCategoryDTO } from "@app/DTOs/index.js";
+import { CreateCategoryDTO, DeleteCategoryDTO, GetCategoryByIdDTO, GetCategoryDTO, UpdateCategoryDTO } from "@app/DTOs/index.js";
 import { CategoryNotFoundError } from "@forit/domain";
-import { createCategory, getCategories, updateCategory } from "@app/use-cases/index.js";
+import { createCategory, deleteCategory, getCategories, getCategoryById, updateCategory } from "@app/use-cases/index.js";
 
 const db = prisma;
 const categoryRepository = new CategoryRepositoryPrisma(db);
@@ -56,6 +56,50 @@ export const getCategoryController = async (req: Request, res: Response) => {
   }
 };
 
+export const getCategoryByIdController = async (req: Request, res: Response) => {
+  if (!req.params.id) {
+    return res.status(400).json({ message: "Id is required" });
+  }
+  const dto: GetCategoryByIdDTO = {
+    id: req.params.id,
+  };
+
+  try {
+    const category = await getCategoryById({ categoryRepository }, dto);
+    res.status(200).json(category);
+  } catch (error: any) {
+    console.error(error);
+    if (error instanceof CategoryNotFoundError) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+    res.status(500).json({
+      message: "Error fetching category",
+    });
+  }
+};
+
+//borra si no el id de la categoria no esta siendo usada en algun producto
+export const deleteCategoryController = async (req: Request, res: Response) => {
+  if (!req.params.id) {
+    return res.status(400).json({ message: "Id is required" });
+  }
+  const dto: DeleteCategoryDTO = {
+    id: req.params.id,
+  };
+
+  try {
+    await deleteCategory({ categoryRepository }, {dto});
+    res.status(204).send();
+  } catch (error: any) {
+    console.error(error);
+    if (error instanceof CategoryNotFoundError) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+    res.status(500).json({
+      message: "Error deleting category",
+    });
+  }
+};
 
 export const updateCategoryController = async (req: Request, res: Response) => {
   if (!req.params.id) {

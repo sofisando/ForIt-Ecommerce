@@ -9,3 +9,11 @@ export interface UpdateCategoryDTO {
 export interface GetCategoryDTO {
   search?: string;
 }
+
+export interface GetCategoryByIdDTO {
+  id: string;
+}
+
+export interface DeleteCategoryDTO {
+  id: string;
+}

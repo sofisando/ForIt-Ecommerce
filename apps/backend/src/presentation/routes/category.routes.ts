@@ -2,15 +2,15 @@
 //Este archivo SOLO conecta rutas con controllers
 
 import { Router } from "express";
-import { createCategoryController, getCategoryController, updateCategoryController } from "@presentation/controllers/category.controller.js";
+import { createCategoryController, deleteCategoryController, getCategoryByIdController, getCategoryController, updateCategoryController } from "@presentation/controllers/category.controller.js";
 
 
 const router = Router();
 
 router.post("/create", createCategoryController);
 router.get("/", getCategoryController);
-// router.get("/getById/:id", getProductByIdController);
-// router.delete("/delete/:id", deleteProductController);
+router.get("/getById/:id", getCategoryByIdController);
+router.delete("/delete/:id", deleteCategoryController);
 router.put("/update/:id", updateCategoryController);
 
 export default router;
