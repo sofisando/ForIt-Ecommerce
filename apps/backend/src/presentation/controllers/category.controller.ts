@@ -2,9 +2,9 @@ import { Request, Response } from "express";
 import { prisma } from "@infra/prisma/prisma.js";
 
 import { CategoryRepositoryPrisma } from "@infra/repos/index.js";
-import { CreateCategoryDTO, UpdateCategoryDTO } from "@app/DTOs/index.js";
+import { CreateCategoryDTO, GetCategoryDTO, UpdateCategoryDTO } from "@app/DTOs/index.js";
 import { CategoryNotFoundError } from "@forit/domain";
-import { createCategory, updateCategory } from "@app/use-cases/index.js";
+import { createCategory, getCategories, updateCategory } from "@app/use-cases/index.js";
 
 const db = prisma;
 const categoryRepository = new CategoryRepositoryPrisma(db);
@@ -30,6 +30,32 @@ export const createCategoryController = async (req: Request, res: Response) => {
     });
   }
 };
+
+export const getCategoryController = async (req: Request, res: Response) => {
+  const dto: GetCategoryDTO = {};
+
+  if (typeof req.query.search === "string") {
+    dto.search = req.query.search;
+  }
+
+  try {
+    const categories = await getCategories(
+      {
+        categoryRepository,
+      },
+      dto,
+    );
+
+    res.status(200).json(categories);
+  } catch (error: unknown) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Error fetching categories",
+    });
+  }
+};
+
 
 export const updateCategoryController = async (req: Request, res: Response) => {
   if (!req.params.id) {

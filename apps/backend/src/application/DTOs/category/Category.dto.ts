@@ -5,3 +5,7 @@ export interface CreateCategoryDTO {
 export interface UpdateCategoryDTO {
   name: string;
 }
+
+export interface GetCategoryDTO {
+  search?: string;
+}

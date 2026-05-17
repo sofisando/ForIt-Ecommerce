@@ -19,8 +19,10 @@ export class CategoryRepositoryPrisma implements CategoryRepository {
     return CategoryMapper.toDomain(result);
   }
 
-  async getAll(): Promise<Category[]> {
-    const results = await this.db.category.findMany();
+  async getAll(filters: any): Promise<Category[]> {
+    const results = await this.db.category.findMany({
+      where: filters,
+    });
 
     return results.map(CategoryMapper.toDomain);
   }
