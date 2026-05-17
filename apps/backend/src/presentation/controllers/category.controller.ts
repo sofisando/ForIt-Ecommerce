@@ -1,0 +1,54 @@
+import { Request, Response } from "express";
+import { prisma } from "@infra/prisma/prisma.js";
+
+import { CategoryRepositoryPrisma } from "@infra/repos/index.js";
+import { CreateCategoryDTO, UpdateCategoryDTO } from "@app/DTOs/index.js";
+import { CategoryNotFoundError } from "@forit/domain";
+import { createCategory, updateCategory } from "@app/use-cases/index.js";
+
+const db = prisma;
+const categoryRepository = new CategoryRepositoryPrisma(db);
+
+export const createCategoryController = async (req: Request, res: Response) => {
+  const dto: CreateCategoryDTO = req.body;
+
+  try {
+    const category = await createCategory(
+      {
+        categoryRepository,
+      },
+      { dto }, //recordar que acá viene el dto con {} porque incluimos en el payload el actor del midleware
+    );
+
+    res.status(201).json(category);
+  } catch (error: any) {
+    console.error(error);
+
+    // 🔥 después podés mejorar esto con error handling centralizado
+    res.status(500).json({
+      message: "Error creating category",
+    });
+  }
+};
+
+export const updateCategoryController = async (req: Request, res: Response) => {
+  if (!req.params.id) {
+    return res.status(400).json({ message: "Id is required" });
+  }
+
+  const id = req.params.id;
+  const dto: UpdateCategoryDTO = req.body;
+
+  try {
+    const updatedCategory = await updateCategory({ categoryRepository }, {id, dto});
+    res.status(200).json(updatedCategory);
+  } catch (error: any) {
+    console.error(error);
+    if (error instanceof CategoryNotFoundError) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+    res.status(500).json({
+      message: "Error updating category",
+    });
+  }
+};

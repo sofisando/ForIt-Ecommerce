@@ -1,6 +1,6 @@
 import { Category } from "../entities/category.js";
-import type { Service } from "../utils/types/service.js";
+import type { Repository } from "../utils/types/repository.js";
 
-export interface CategoryService extends Service<Category> {
+export interface CategoryRepository extends Repository<Category> {
   findByName: (name: string) => Promise<Category | undefined>;
 }
