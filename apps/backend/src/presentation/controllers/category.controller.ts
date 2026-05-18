@@ -3,7 +3,7 @@ import { prisma } from "@infra/prisma/prisma.js";
 
 import { CategoryRepositoryPrisma } from "@infra/repos/index.js";
 import { CreateCategoryDTO, DeleteCategoryDTO, GetCategoryByIdDTO, GetCategoryDTO, UpdateCategoryDTO } from "@app/DTOs/index.js";
-import { CategoryNotFoundError } from "@forit/domain";
+import { CategoryAlreadyExistsError, CategoryNotFoundError } from "@forit/domain";
 import { createCategory, deleteCategory, getCategories, getCategoryById, updateCategory } from "@app/use-cases/index.js";
 
 const db = prisma;
@@ -23,6 +23,9 @@ export const createCategoryController = async (req: Request, res: Response) => {
     res.status(201).json(category);
   } catch (error: any) {
     console.error(error);
+    if (error instanceof CategoryAlreadyExistsError) {
+      return res.status(409).json({ message: "Category already exists" });
+    }
 
     // 🔥 después podés mejorar esto con error handling centralizado
     res.status(500).json({
