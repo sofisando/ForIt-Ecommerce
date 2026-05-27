@@ -1,5 +1,9 @@
+//user
 export class UserNotFoundError extends Error {}
 export class UnauthorizedError extends Error {}
+export class UserAlreadyExistsError extends Error {}
+//product
 export class ProductNotFoundError extends Error {}
+//category
 export class CategoryAlreadyExistsError extends Error {}
 export class CategoryNotFoundError extends Error {}
