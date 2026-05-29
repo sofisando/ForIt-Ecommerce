@@ -2,9 +2,9 @@ import { Request, Response } from "express";
 import { prisma } from "@infra/prisma/prisma.js";
 
 import { UserRepositoryPrisma } from "@infra/repos/index.js";
-import { CreateUserDTO } from "@app/DTOs/index.js";
+import { CreateUserDTO, GetUserDTO } from "@app/DTOs/index.js";
 import { UserAlreadyExistsError } from "@forit/domain";
-import { createUser } from "@app/use-cases/index.js";
+import { createUser, getUsers } from "@app/use-cases/index.js";
 
 const db = prisma;
 const userRepository = new UserRepositoryPrisma(db);
@@ -34,30 +34,31 @@ export const createUserController = async (req: Request, res: Response) => {
   }
 };
 
-// export const getUserController = async (req: Request, res: Response) => {
-//   const dto: GetCategoryDTO = {};
+export const getUserController = async (req: Request, res: Response) => {
+  const dto: GetUserDTO = {};
 
-//   if (typeof req.query.search === "string") {
-//     dto.search = req.query.search;
-//   }
+  if (typeof req.query.search === "string") {
+    dto.search = req.query.search;
+  }
+  //con este search puedo buscar por nombre del cliente, el resto no
 
-//   try {
-//     const categories = await getCategories(
-//       {
-//         userRepository,
-//       },
-//       dto,
-//     );
+  try {
+    const users = await getUsers(
+      {
+        userRepository,
+      },
+      dto,
+    );
 
-//     res.status(200).json(categories);
-//   } catch (error: unknown) {
-//     console.error(error);
+    res.status(200).json(users);
+  } catch (error: unknown) {
+    console.error(error);
 
-//     res.status(500).json({
-//       message: "Error fetching categories",
-//     });
-//   }
-// };
+    res.status(500).json({
+      message: "Error fetching users",
+    });
+  }
+};
 
 // export const getCategoryByIdController = async (req: Request, res: Response) => {
 //   if (!req.params.id) {
