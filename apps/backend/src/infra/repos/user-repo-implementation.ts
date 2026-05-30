@@ -43,7 +43,7 @@ export class UserRepositoryPrisma implements UserRepository {
     });
   }
 
-  async findByEmail(email: string): Promise<User | undefined> {
+  async getByEmail(email: string): Promise<User | undefined> {
       const result = await this.db.user.findUnique({
         where: { email },
       });

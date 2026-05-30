@@ -20,7 +20,7 @@ export async function updateProduct(
   }
 
   const updatedProduct = new Product(
-    id,
+    existingProduct.id,
     dto.name,
     dto.description,
     dto.imageUrl,

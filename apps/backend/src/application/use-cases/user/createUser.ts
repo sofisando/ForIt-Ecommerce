@@ -17,7 +17,7 @@ export async function createUser(
   { userRepository }: CreateUserDeps,
   dto: CreateUserDTO,
 ): Promise<User> {
-  const existingUser = await userRepository.findByEmail(dto.email);
+  const existingUser = await userRepository.getByEmail(dto.email);
 
   if (existingUser) {
     throw new UserAlreadyExistsError(dto.email);

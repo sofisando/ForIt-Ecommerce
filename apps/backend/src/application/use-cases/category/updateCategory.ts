@@ -7,7 +7,7 @@ interface UpdateCategoryDeps {
 
 type UpdateCategoryPayload = {
   //   actor: AuthenticatedUser; //viene del midleware
-  id: string; //lo pongo acá y no en el dto porque sino se puede llegar a cambiar el id y no quiero eso
+  id: string; // lo pongo acá porque viene desde la url
   dto: UpdateCategoryDTO;
 };
 
@@ -25,7 +25,7 @@ export async function updateCategory(
     }
 
   const updatedCategory = new Category (
-    id,
+    existingCategory.id,
     dto.name
   )
 
