@@ -3,7 +3,7 @@ export interface CreateCategoryDTO {
 }
 
 export interface UpdateCategoryDTO {
-  name: string;
+  name?: string;
 }
 
 export interface GetCategoryDTO {

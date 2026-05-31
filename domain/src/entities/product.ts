@@ -13,7 +13,11 @@ export class Product extends Entity {
   ) {
     super(id);
 
-    if (!_name.trim()) {
+    this.validateName(_name);
+  }
+
+  private validateName(name: string): void {
+    if (!name.trim()) {
       throw new Error("Product name is required");
     }
   }
@@ -33,8 +37,21 @@ export class Product extends Entity {
   get categoryId() {
     return this._categoryId;
   }
-
+  
+  changeName(newName: string): void {
+    this.validateName(newName);
+    this._name = newName;
+  }
+  changeDescription(newDescription: string): void {
+    this._description = newDescription;
+  }
+  changeImageUrl(newImageUrl: string): void {
+    this._imageUrl = newImageUrl;
+  }
   changePrice(newPrice: Money) {
     this._price = newPrice;
+  }
+  changeCategory(newCategoryId: string): void {
+    this._categoryId = newCategoryId;
   }
 }

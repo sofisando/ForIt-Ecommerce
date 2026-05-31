@@ -19,17 +19,16 @@ export async function updateCategory(
   //     throw new UnauthorizedError();
   //   }
 
-  const existingCategory = await categoryRepository.getById(id);
-  if (!existingCategory) {
+  const category = await categoryRepository.getById(id);
+  if (!category) {
       throw new CategoryNotFoundError(id);
     }
 
-  const updatedCategory = new Category (
-    existingCategory.id,
-    dto.name
-  )
+  if (dto.name !== undefined) {
+    category.changeName(dto.name);
+  }
 
-  await categoryRepository.save(updatedCategory);
+  await categoryRepository.save(category);
 
-  return updatedCategory;
+  return category;
 }

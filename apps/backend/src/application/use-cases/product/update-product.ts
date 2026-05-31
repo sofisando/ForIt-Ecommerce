@@ -7,28 +7,39 @@ interface UpdateProductDeps {
   productRepository: ProductRepository;
 }
 
+//ponerle al midleware de la autenticacion
+
 export async function updateProduct(
   { productRepository }: UpdateProductDeps,
   id: string,
-  dto: UpdateProductDTO
+  dto: UpdateProductDTO,
 ): Promise<Product> {
+  const product = await productRepository.getById(id);
 
-  const existingProduct = await productRepository.getById(id);
-
-  if (!existingProduct) {
+  if (!product) {
     throw new ProductNotFoundError();
   }
 
-  const updatedProduct = new Product(
-    existingProduct.id,
-    dto.name,
-    dto.description,
-    dto.imageUrl,
-    new Money(dto.price),
-    dto.categoryId
-  );
+  if (dto.name !== undefined) {
+    product.changeName(dto.name);
+  }
 
-  await productRepository.save(updatedProduct);
+  if (dto.description !== undefined) {
+    product.changeDescription(dto.description);
+  }
 
-  return updatedProduct;
+  if (dto.imageUrl !== undefined) {
+    product.changeImageUrl(dto.imageUrl);
+  }
+
+  if (dto.price !== undefined) {
+    product.changePrice(new Money(dto.price));
+  }
+  if (dto.categoryId !== undefined) {
+    product.changeCategory(dto.categoryId);
+  }
+
+  await productRepository.save(product);
+
+  return product;
 }
