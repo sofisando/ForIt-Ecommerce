@@ -21,9 +21,9 @@ export interface DeleteUserDTO {
 }
 
 export interface UpdateUserDTO {
-  name: string;
-  DNI: string;
-  email: string;
-  password: string;
+  name?: string;
+  DNI?: string;
+  email?: string;
+  password?: string;
   //no lo voy a poner el role, para que no se lo pueda cambiar el propio usuario, si quisiera cambiar el rol tendría que hacerlo un admin en un use case aparte
 }
