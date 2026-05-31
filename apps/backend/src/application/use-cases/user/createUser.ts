@@ -3,6 +3,7 @@ import {
   type UserRepository,
   User,
   UserAlreadyExistsError,
+  UserRole,
 } from "@forit/domain";
 import { DNI } from "@forit/domain/dist/ValueObjects/DNI.js";
 import { Email } from "@forit/domain/dist/ValueObjects/Email.js";
@@ -29,7 +30,7 @@ export async function createUser(
     new DNI(dto.DNI),
     new Email(dto.email),
     new Password(dto.password),
-    dto.role,
+    UserRole.CLIENT
   );
 
   await userRepository.save(user);
