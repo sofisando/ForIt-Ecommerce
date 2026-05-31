@@ -21,21 +21,29 @@ export async function updateUser(
   { userRepository }: UpdateUserDeps,
   { id, dto }: UpdateUserPayload,
 ): Promise<User> {
-  const existingUser = await userRepository.getById(id);
-  if (!existingUser) {
-    throw new UserNotFoundError(id);
-  }
+  const user = await userRepository.getById(id);
 
-  const updatedUser = new User(
-    existingUser.id,
-    dto.name,
-    new DNI(dto.DNI),
-    new Email(dto.email),
-    new Password(dto.password),
-    existingUser.role,
-  );
+if (!user) {
+  throw new UserNotFoundError(id);
+}
 
-  await userRepository.save(updatedUser);
+if (dto.name !== undefined ) {
+  user.changeName(dto.name);
+}
 
-  return updatedUser;
+if (dto.DNI !== undefined ) {
+  user.changeDNI(new DNI(dto.DNI));
+}
+
+if (dto.email !== undefined ) {
+  user.changeEmail(new Email(dto.email));
+}
+
+if (dto.password !== undefined ) {
+  user.changePassword(new Password(dto.password));
+}
+
+await userRepository.save(user);
+
+return user;
 }

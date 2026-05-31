@@ -19,11 +19,18 @@ export class User extends Entity {
   ) {
     super(id);
 
-    if (!this._name.trim()) {
+    this.validateName(_name);
+    this.validateRole(_role);
+  }
+
+  private validateName(name: string): void {
+    if (!name.trim()) {
       throw new Error("Name is required");
     }
+  }
 
-    if (!this._role) {
+  private validateRole(role: UserRole): void {
+    if (!role) {
       throw new Error("Role is required");
     }
   }
@@ -48,11 +55,24 @@ export class User extends Entity {
     return this._role;
   }
 
+  changeName(newName: string): void {
+    this.validateName(newName);
+    this._name = newName;
+  }
+
+  changeDNI(newDNI: DNI): void {
+    this._DNI = newDNI;
+  }
+
   changeEmail(newEmail: Email) {
     this._email = newEmail;
   }
 
   changePassword(newPassword: Password) {
-    this._password = newPassword;
+   if (newPassword === this._password) {
+    throw new Error("Cannot reuse password");
   }
+
+  this._password = newPassword;
+}
 }
