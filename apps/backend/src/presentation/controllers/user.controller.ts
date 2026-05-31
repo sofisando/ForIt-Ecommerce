@@ -2,9 +2,9 @@ import { Request, Response } from "express";
 import { prisma } from "@infra/prisma/prisma.js";
 
 import { UserRepositoryPrisma } from "@infra/repos/index.js";
-import { CreateUserDTO, GetUserDTO } from "@app/DTOs/index.js";
-import { UserAlreadyExistsError } from "@forit/domain";
-import { createUser, getUsers } from "@app/use-cases/index.js";
+import { CreateUserDTO, DeleteUserDTO, GetUserByIdDTO, GetUserDTO, UpdateUserDTO } from "@app/DTOs/index.js";
+import { UserAlreadyExistsError, UserNotFoundError } from "@forit/domain";
+import { createUser, deleteUser, getUserById, getUsers, updateUser } from "@app/use-cases/index.js";
 
 const db = prisma;
 const userRepository = new UserRepositoryPrisma(db);
@@ -60,69 +60,69 @@ export const getUserController = async (req: Request, res: Response) => {
   }
 };
 
-// export const getCategoryByIdController = async (req: Request, res: Response) => {
-//   if (!req.params.id) {
-//     return res.status(400).json({ message: "Id is required" });
-//   }
-//   const dto: GetCategoryByIdDTO = {
-//     id: req.params.id,
-//   };
+export const getUserByIdController = async (req: Request, res: Response) => {
+  if (!req.params.id) {
+    return res.status(400).json({ message: "Id is required" });
+  }
+  const dto: GetUserByIdDTO = {
+    id: req.params.id,
+  };
 
-//   try {
-//     const category = await getCategoryById({ userRepository }, dto);
-//     res.status(200).json(category);
-//   } catch (error: any) {
-//     console.error(error);
-//     if (error instanceof CategoryNotFoundError) {
-//       return res.status(404).json({ message: "Category not found" });
-//     }
-//     res.status(500).json({
-//       message: "Error fetching category",
-//     });
-//   }
-// };
+  try {
+    const user = await getUserById({ userRepository }, dto);
+    res.status(200).json(user);
+  } catch (error: any) {
+    console.error(error);
+    if (error instanceof UserNotFoundError) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(500).json({
+      message: "Error fetching user",
+    });
+  }
+};
 
-// //borra si no el id de la categoria no esta siendo usada en algun producto
-// export const deleteCategoryController = async (req: Request, res: Response) => {
-//   if (!req.params.id) {
-//     return res.status(400).json({ message: "Id is required" });
-//   }
-//   const dto: DeleteCategoryDTO = {
-//     id: req.params.id,
-//   };
+// ver si se puede "borrar" el usuario o desabilitarlo en su defecto, o ver si tienen derecho a borrarlo, que creo que si
+export const deleteUserController = async (req: Request, res: Response) => {
+  if (!req.params.id) {
+    return res.status(400).json({ message: "Id is required" });
+  }
+  const dto: DeleteUserDTO = {
+    id: req.params.id,
+  };
 
-//   try {
-//     await deleteCategory({ userRepository }, {dto});
-//     res.status(204).send();
-//   } catch (error: any) {
-//     console.error(error);
-//     if (error instanceof CategoryNotFoundError) {
-//       return res.status(404).json({ message: "Category not found" });
-//     }
-//     res.status(500).json({
-//       message: "Error deleting category",
-//     });
-//   }
-// };
+  try {
+    await deleteUser({ userRepository }, { dto });
+    res.status(204).send();
+  } catch (error: any) {
+    console.error(error);
+    if (error instanceof UserNotFoundError) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(500).json({
+      message: "Error deleting user",
+    });
+  }
+};
 
-// export const updateCategoryController = async (req: Request, res: Response) => {
-//   if (!req.params.id) {
-//     return res.status(400).json({ message: "Id is required" });
-//   }
+export const updateUserController = async (req: Request, res: Response) => {
+  if (!req.params.id) {
+    return res.status(400).json({ message: "Id is required" });
+  }
 
-//   const id = req.params.id;
-//   const dto: UpdateCategoryDTO = req.body;
+  const id = req.params.id;
+  const dto: UpdateUserDTO = req.body;
 
-//   try {
-//     const updatedCategory = await updateCategory({ userRepository }, {id, dto});
-//     res.status(200).json(updatedCategory);
-//   } catch (error: any) {
-//     console.error(error);
-//     if (error instanceof CategoryNotFoundError) {
-//       return res.status(404).json({ message: "Category not found" });
-//     }
-//     res.status(500).json({
-//       message: "Error updating category",
-//     });
-//   }
-// };
+  try {
+    const updatedUser = await updateUser({ userRepository }, {id, dto});
+    res.status(200).json(updatedUser);
+  } catch (error: any) {
+    console.error(error);
+    if (error instanceof UserNotFoundError) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(500).json({
+      message: "Error updating user",
+    });
+  }
+};
