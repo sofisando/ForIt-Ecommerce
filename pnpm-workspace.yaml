@@ -1,0 +1,11 @@
+packages:
+  - "domain"
+  - "apps/*"
+
+minimumReleaseAge: 4320
+
+//ver que onda los de aca abajo, porque esto afecta a los builds, de todas formas yo lo suelo hacer a mano todavía
+
+onlyBuildDependencies: [] //hacemos un listado de los que tienen permiso de hacer build
+ignoreBuildDependencies: [] 
+strictDepBuilds: true
