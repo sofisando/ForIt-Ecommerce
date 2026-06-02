@@ -4,7 +4,7 @@
     "target": "esnext",
     "types": [],
     "sourceMap": true,
-    "declaration": true,
+    "declaration": true, //este hace que se genere un archivo .d.ts con los types, es como para una libreria
     "declarationMap": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,

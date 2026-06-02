@@ -20,6 +20,10 @@ import { ProductRepositoryPrisma } from "@infra/repos/index.js";
 const db = prisma;
 const productRepository = new ProductRepositoryPrisma(db);
 
+interface ProductParams {
+  id: string;
+}
+
 export const createProductController = async (req: Request, res: Response) => {
   const dto: CreateProductDTO = req.body;
 
@@ -87,7 +91,7 @@ export const getProductsController = async (req: Request, res: Response) => {
   }
 };
 
-export const getProductByIdController = async (req: Request, res: Response) => {
+export const getProductByIdController = async (req: Request<ProductParams>, res: Response) => {
   if (!req.params.id) {
     return res.status(400).json({ message: "Id is required" });
   }
@@ -109,7 +113,7 @@ export const getProductByIdController = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteProductController = async (req: Request, res: Response) => {
+export const deleteProductController = async (req: Request<ProductParams>, res: Response) => {
   if (!req.params.id) {
     return res.status(400).json({ message: "Id is required" });
   }
@@ -131,7 +135,7 @@ export const deleteProductController = async (req: Request, res: Response) => {
   }
 };
 
-export const updateProductController = async (req: Request, res: Response) => {
+export const updateProductController = async (req: Request<ProductParams>, res: Response) => {
   if (!req.params.id) {
     return res.status(400).json({ message: "Id is required" });
   }

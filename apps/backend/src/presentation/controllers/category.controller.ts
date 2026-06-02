@@ -9,6 +9,10 @@ import { createCategory, deleteCategory, getCategories, getCategoryById, updateC
 const db = prisma;
 const categoryRepository = new CategoryRepositoryPrisma(db);
 
+interface CategoryParams {
+  id: string;
+}
+
 export const createCategoryController = async (req: Request, res: Response) => {
   const dto: CreateCategoryDTO = req.body;
 
@@ -59,7 +63,7 @@ export const getCategoryController = async (req: Request, res: Response) => {
   }
 };
 
-export const getCategoryByIdController = async (req: Request, res: Response) => {
+export const getCategoryByIdController = async (req: Request<CategoryParams>, res: Response) => {
   if (!req.params.id) {
     return res.status(400).json({ message: "Id is required" });
   }
@@ -82,7 +86,7 @@ export const getCategoryByIdController = async (req: Request, res: Response) => 
 };
 
 //borra si no el id de la categoria no esta siendo usada en algun producto
-export const deleteCategoryController = async (req: Request, res: Response) => {
+export const deleteCategoryController = async (req: Request<CategoryParams>, res: Response) => {
   if (!req.params.id) {
     return res.status(400).json({ message: "Id is required" });
   }
@@ -104,7 +108,7 @@ export const deleteCategoryController = async (req: Request, res: Response) => {
   }
 };
 
-export const updateCategoryController = async (req: Request, res: Response) => {
+export const updateCategoryController = async (req: Request<CategoryParams>, res: Response) => {
   if (!req.params.id) {
     return res.status(400).json({ message: "Id is required" });
   }

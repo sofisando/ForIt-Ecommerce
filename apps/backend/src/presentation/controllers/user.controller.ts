@@ -9,6 +9,10 @@ import { createUser, deleteUser, getUserById, getUsers, updateUser } from "@app/
 const db = prisma;
 const userRepository = new UserRepositoryPrisma(db);
 
+interface UserParams {
+  id: string;
+}
+
 export const createUserController = async (req: Request, res: Response) => {
   const dto: CreateUserDTO = req.body;
 
@@ -60,10 +64,13 @@ export const getUserController = async (req: Request, res: Response) => {
   }
 };
 
-export const getUserByIdController = async (req: Request, res: Response) => {
+export const getUserByIdController = async (req: Request<UserParams>, res: Response) => {
   if (!req.params.id) {
     return res.status(400).json({ message: "Id is required" });
   }
+  type ReqType = Request;
+  const id = req.params.id;
+  type ParamsType = typeof req.params;
   const dto: GetUserByIdDTO = {
     id: req.params.id,
   };
@@ -83,7 +90,7 @@ export const getUserByIdController = async (req: Request, res: Response) => {
 };
 
 // ver si se puede "borrar" el usuario o desabilitarlo en su defecto, o ver si tienen derecho a borrarlo, que creo que si
-export const deleteUserController = async (req: Request, res: Response) => {
+export const deleteUserController = async (req: Request<UserParams>, res: Response) => {
   if (!req.params.id) {
     return res.status(400).json({ message: "Id is required" });
   }
@@ -105,7 +112,7 @@ export const deleteUserController = async (req: Request, res: Response) => {
   }
 };
 
-export const updateUserController = async (req: Request, res: Response) => {
+export const updateUserController = async (req: Request<UserParams>, res: Response) => {
   if (!req.params.id) {
     return res.status(400).json({ message: "Id is required" });
   }
