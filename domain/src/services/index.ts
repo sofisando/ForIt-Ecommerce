@@ -1,4 +1,4 @@
-export * from "./auth-service.js";
+export * from "./auth-repository.js";
 export * from "./cart-service.js";
 export * from "./category-repository.js";
 export * from "./discount-service.js";

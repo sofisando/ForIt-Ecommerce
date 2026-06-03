@@ -1,19 +1,19 @@
 import { CreateUserDTO } from "@app/DTOs/index.js";
 import {
   type UserRepository,
+  AuthenticationRepo,
+  DNI,
+  Email,
+  Password,
+  PasswordHash,
   User,
   UserAlreadyExistsError,
   UserRole,
 } from "@forit/domain";
-import { DNI } from "@forit/domain/dist/ValueObjects/DNI.js";
-import { Email } from "@forit/domain/dist/ValueObjects/Email.js";
-import { Password } from "@forit/domain/dist/ValueObjects/Password.js";
-import { PasswordHash } from "@forit/domain/dist/ValueObjects/PasswordHash.js";
-import { BcryptPasswordHasher } from "@app/utils/hasher.js";
 
 interface CreateUserDeps {
   userRepository: UserRepository;
-  passwordHasher: BcryptPasswordHasher;
+  passwordHasher: AuthenticationRepo;
   //despues poner EmailRepository
 }
 

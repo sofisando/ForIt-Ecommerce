@@ -7,3 +7,5 @@ export class ProductNotFoundError extends Error {}
 //category
 export class CategoryAlreadyExistsError extends Error {}
 export class CategoryNotFoundError extends Error {}
+//password
+export class PasswordReuseError extends Error {}

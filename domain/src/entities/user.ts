@@ -1,6 +1,5 @@
 import { Entity } from "../utils/types/entity";
-import { DNI, Email, Password } from "../ValueObjects";
-import { PasswordHash } from "../ValueObjects/PasswordHash";
+import { DNI, Email, PasswordHash } from "../ValueObjects/index.js";
 
 export const UserRole = {
   ADMIN: "ADMIN",
@@ -73,3 +72,5 @@ export class User extends Entity {
     this._passwordHash = newPasswordHash;
   }
 }
+
+export type SecureUser = Omit<User, "passwordHash">;

@@ -1,16 +1,15 @@
 import { Request, Response } from "express";
 import { prisma } from "@infra/prisma/prisma.js";
 
-import { UserRepositoryPrisma } from "@infra/repos/index.js";
+import { BcryptPasswordHasher, UserRepositoryPrisma } from "@infra/repos/index.js";
 import { CreateUserDTO, DeleteUserDTO, GetUserByIdDTO, GetUserDTO, UpdateUserDTO } from "@app/DTOs/index.js";
 import { UserAlreadyExistsError, UserNotFoundError } from "@forit/domain";
 import { createUser, deleteUser, getUserById, getUsers, updateUser } from "@app/use-cases/index.js";
-import { BcryptPasswordHasher, BcryptPasswordComparer } from "@app/utils/index.js";
+
 
 const db = prisma;
 const userRepository = new UserRepositoryPrisma(db);
 const passwordHasher = new BcryptPasswordHasher();
-const passwordComparer = new BcryptPasswordComparer();
 
 interface UserParams {
   id: string;
@@ -97,9 +96,6 @@ export const getUserByIdController = async (req: Request<UserParams>, res: Respo
   if (!req.params.id) {
     return res.status(400).json({ message: "Id is required" });
   }
-  type ReqType = Request;
-  const id = req.params.id;
-  type ParamsType = typeof req.params;
   const dto: GetUserByIdDTO = {
     id: req.params.id,
   };
@@ -146,11 +142,11 @@ export const updateUserController = async (req: Request<UserParams>, res: Respon
     return res.status(400).json({ message: "Id is required" });
   }
 
-  const id = req.params.id;
+  const targetUserId = req.params.id;
   const dto: UpdateUserDTO = req.body;
 
   try {
-    const updatedUser = await updateUser({ userRepository, passwordComparer, passwordHasher }, {id, dto});
+    const updatedUser = await updateUser({ userRepository }, {targetUserId, dto});
     res.status(200).json(updatedUser);
   } catch (error: any) {
     console.error(error);
