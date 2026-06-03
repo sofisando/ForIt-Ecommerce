@@ -1,5 +1,6 @@
 import { Entity } from "../utils/types/entity";
 import { DNI, Email, Password } from "../ValueObjects";
+import { PasswordHash } from "../ValueObjects/PasswordHash";
 
 export const UserRole = {
   ADMIN: "ADMIN",
@@ -14,7 +15,7 @@ export class User extends Entity {
     private _name: string,
     private _DNI: DNI,
     private _email: Email,
-    private _password: Password,
+    private _passwordHash: PasswordHash,
     private _role: UserRole,
   ) {
     super(id);
@@ -47,8 +48,8 @@ export class User extends Entity {
     return this._email;
   }
 
-  get password() {
-    return this._password;
+  get passwordHash() {
+    return this._passwordHash;
   }
 
   get role() {
@@ -68,11 +69,7 @@ export class User extends Entity {
     this._email = newEmail;
   }
 
-  changePassword(newPassword: Password) {
-   if (newPassword === this._password) {
-    throw new Error("Cannot reuse password");
+  changePassword(newPasswordHash: PasswordHash): void {
+    this._passwordHash = newPasswordHash;
   }
-
-  this._password = newPassword;
-}
 }

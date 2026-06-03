@@ -13,11 +13,11 @@ export class Password {
     this.value = value;
   }
 
-  toString(): string {
+  getValue(): string {
     return this.value;
   }
 
-  equals(other: Password): boolean {
-    return this.value === other.value;
+  toString(): string {
+    return this.value;
   }
 }

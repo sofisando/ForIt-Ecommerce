@@ -1,7 +1,7 @@
 import { User } from "@forit/domain";
 import { DNI } from "@forit/domain/dist/ValueObjects/DNI.js";
 import { Email } from "@forit/domain/dist/ValueObjects/Email.js";
-import { Password } from "@forit/domain/dist/ValueObjects/Password.js";
+import { PasswordHash } from "@forit/domain/dist/ValueObjects/PasswordHash.js";
 import { User as PrismaUser } from "@infra/generated/prisma/client.js";
 
 export class UserMapper {
@@ -11,7 +11,7 @@ export class UserMapper {
       prismaUser.name,
       new DNI(prismaUser.DNI),
       new Email(prismaUser.email),
-      new Password(prismaUser.password),
+      new PasswordHash(prismaUser.password),
       prismaUser.role
     );
   }
@@ -22,7 +22,7 @@ export class UserMapper {
       name: user.name,
       DNI: user.DNI.toString(),
       email: user.email.toString(),
-      password: user.password.toString(),
+      password: user.passwordHash.toString(),
       role: user.role,
     };
   }

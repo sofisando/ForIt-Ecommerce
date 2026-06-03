@@ -7,7 +7,11 @@ import { createUserController, deleteUserController, getUserByIdController, getU
 
 const router = Router();
 
-router.post("/create", createUserController);
+router.post("/register", createUserController);
+// router.post("/login", loginUserController);
+// router.post("/logout", logoutUserController);
+// router.get("/protected", protectedUserController);
+
 router.get("/", getUserController);
 router.get("/getById/:id", getUserByIdController);
 router.delete("/delete/:id", deleteUserController);

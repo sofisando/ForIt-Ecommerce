@@ -5,9 +5,12 @@ import { UserRepositoryPrisma } from "@infra/repos/index.js";
 import { CreateUserDTO, DeleteUserDTO, GetUserByIdDTO, GetUserDTO, UpdateUserDTO } from "@app/DTOs/index.js";
 import { UserAlreadyExistsError, UserNotFoundError } from "@forit/domain";
 import { createUser, deleteUser, getUserById, getUsers, updateUser } from "@app/use-cases/index.js";
+import { BcryptPasswordHasher, BcryptPasswordComparer } from "@app/utils/index.js";
 
 const db = prisma;
 const userRepository = new UserRepositoryPrisma(db);
+const passwordHasher = new BcryptPasswordHasher();
+const passwordComparer = new BcryptPasswordComparer();
 
 interface UserParams {
   id: string;
@@ -20,6 +23,7 @@ export const createUserController = async (req: Request, res: Response) => {
     const user = await createUser(
       {
         userRepository,
+        passwordHasher
       },
       dto ,
     );
@@ -37,6 +41,31 @@ export const createUserController = async (req: Request, res: Response) => {
     });
   }
 };
+
+// export const loginUserController = async (req: Request, res: Response) => {
+//   const dto: CreateUserDTO = req.body;
+
+//   try {
+//     const user = await createUser(
+//       {
+//         userRepository,
+//       },
+//       dto,
+//     );
+
+//     res.status(201).json(user);
+//   } catch (error: any) {
+//     console.error(error);
+//     if (error instanceof UserAlreadyExistsError) {
+//       return res.status(409).json({ message: "User already exists" });
+//     }
+
+//     // 🔥 después podés mejorar esto con error handling centralizado
+//     res.status(500).json({
+//       message: "Error creating user",
+//     });
+//   }
+// };
 
 export const getUserController = async (req: Request, res: Response) => {
   const dto: GetUserDTO = {};
@@ -121,7 +150,7 @@ export const updateUserController = async (req: Request<UserParams>, res: Respon
   const dto: UpdateUserDTO = req.body;
 
   try {
-    const updatedUser = await updateUser({ userRepository }, {id, dto});
+    const updatedUser = await updateUser({ userRepository, passwordComparer, passwordHasher }, {id, dto});
     res.status(200).json(updatedUser);
   } catch (error: any) {
     console.error(error);
