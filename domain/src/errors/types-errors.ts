@@ -8,4 +8,5 @@ export class ProductNotFoundError extends Error {}
 export class CategoryAlreadyExistsError extends Error {}
 export class CategoryNotFoundError extends Error {}
 //password
+export class IncorrectPasswordError extends Error {}
 export class PasswordReuseError extends Error {}

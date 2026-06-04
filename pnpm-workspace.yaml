@@ -2,7 +2,7 @@ packages:
   - "domain"
   - "apps/*"
 
-minimumReleaseAge: 4320
+# minimumReleaseAge: 4320
 
 #ver que onda los de aca abajo, porque esto afecta a los builds, de todas formas yo lo suelo hacer a mano todavía
 

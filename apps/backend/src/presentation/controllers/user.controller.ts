@@ -3,14 +3,29 @@ import { prisma } from "@infra/prisma/prisma.js";
 
 import { UserRepositoryPrisma } from "@infra/repos/index.js";
 import { BcryptPasswordHasher } from "@infra/services/hash-service.js";
-import { CreateUserDTO, DeleteUserDTO, GetUserByIdDTO, GetUserDTO, LoginUserDTO, UpdateUserDTO } from "@app/DTOs/index.js";
+import {
+  CreateUserDTO,
+  DeleteUserDTO,
+  GetUserByIdDTO,
+  GetUserDTO,
+  LoginUserDTO,
+  UpdateUserDTO,
+} from "@app/DTOs/index.js";
 import { UserAlreadyExistsError, UserNotFoundError } from "@forit/domain";
-import { createUser, deleteUser, getUserById, getUsers, updateUser } from "@app/use-cases/index.js";
-
+import {
+  createUser,
+  deleteUser,
+  getUserById,
+  getUsers,
+  updateUser,
+} from "@app/use-cases/index.js";
+import { loginUser } from "@app/use-cases/user/loginUser.js";
+import { JwtTokenProvider } from "@infra/services/JwtTokenProvider.js";
 
 const db = prisma;
 const userRepository = new UserRepositoryPrisma(db);
 const passwordHasher = new BcryptPasswordHasher();
+const tokenProvider = new JwtTokenProvider();
 
 interface UserParams {
   id: string;
@@ -23,9 +38,9 @@ export const createUserController = async (req: Request, res: Response) => {
     const user = await createUser(
       {
         userRepository,
-        passwordHasher
+        passwordHasher,
       },
-      dto ,
+      dto,
     );
 
     res.status(201).json(user);
@@ -49,11 +64,20 @@ export const loginUserController = async (req: Request, res: Response) => {
     const user = await loginUser(
       {
         userRepository,
+        passwordHasher,
+        tokenProvider,
       },
       dto,
     );
 
-    res.status(201).json(user);
+    res
+    .cookie("token", user.token, { 
+      httpOnly: true, //la cookie solo se puede acceder desde el servidor
+      // secure: process.env.NODE_ENV === "production", //la cookie solo se envía en conexiones seguras https
+      // sameSite: "strict", //la cookie solo se envía en solicitudes del mismo dominio
+      maxAge: 1000 * 60 * 60 * 24, //la cookie expira en 1 día
+     })
+    .status(201).json(user);
   } catch (error: any) {
     console.error(error);
     if (error instanceof UserAlreadyExistsError) {
@@ -93,7 +117,10 @@ export const getUserController = async (req: Request, res: Response) => {
   }
 };
 
-export const getUserByIdController = async (req: Request<UserParams>, res: Response) => {
+export const getUserByIdController = async (
+  req: Request<UserParams>,
+  res: Response,
+) => {
   if (!req.params.id) {
     return res.status(400).json({ message: "Id is required" });
   }
@@ -116,7 +143,10 @@ export const getUserByIdController = async (req: Request<UserParams>, res: Respo
 };
 
 // ver si se puede "borrar" el usuario o desabilitarlo en su defecto, o ver si tienen derecho a borrarlo, que creo que si
-export const deleteUserController = async (req: Request<UserParams>, res: Response) => {
+export const deleteUserController = async (
+  req: Request<UserParams>,
+  res: Response,
+) => {
   if (!req.params.id) {
     return res.status(400).json({ message: "Id is required" });
   }
@@ -138,7 +168,10 @@ export const deleteUserController = async (req: Request<UserParams>, res: Respon
   }
 };
 
-export const updateUserController = async (req: Request<UserParams>, res: Response) => {
+export const updateUserController = async (
+  req: Request<UserParams>,
+  res: Response,
+) => {
   if (!req.params.id) {
     return res.status(400).json({ message: "Id is required" });
   }
@@ -147,7 +180,10 @@ export const updateUserController = async (req: Request<UserParams>, res: Respon
   const dto: UpdateUserDTO = req.body;
 
   try {
-    const updatedUser = await updateUser({ userRepository }, {targetUserId, dto});
+    const updatedUser = await updateUser(
+      { userRepository },
+      { targetUserId, dto },
+    );
     res.status(200).json(updatedUser);
   } catch (error: any) {
     console.error(error);

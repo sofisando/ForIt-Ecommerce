@@ -1,3 +1,4 @@
+import { LoginResponseDTO } from "@app/DTOs/user.dto.js";
 import { User } from "@forit/domain";
 import { DNI } from "@forit/domain/dist/ValueObjects/DNI.js";
 import { Email } from "@forit/domain/dist/ValueObjects/Email.js";
@@ -12,7 +13,7 @@ export class UserMapper {
       new DNI(prismaUser.DNI),
       new Email(prismaUser.email),
       new PasswordHash(prismaUser.password),
-      prismaUser.role
+      prismaUser.role,
     );
   }
 
@@ -24,6 +25,18 @@ export class UserMapper {
       email: user.email.toString(),
       password: user.passwordHash.toString(),
       role: user.role,
+    };
+  }
+
+  static LoginResponseDTO(user: User, token: string): LoginResponseDTO {
+    return {
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email.toString(),
+        role: user.role,
+      },
     };
   }
 }
