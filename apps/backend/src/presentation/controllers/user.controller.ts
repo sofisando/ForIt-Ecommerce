@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import { prisma } from "@infra/prisma/prisma.js";
 
-import { BcryptPasswordHasher, UserRepositoryPrisma } from "@infra/repos/index.js";
-import { CreateUserDTO, DeleteUserDTO, GetUserByIdDTO, GetUserDTO, UpdateUserDTO } from "@app/DTOs/index.js";
+import { UserRepositoryPrisma } from "@infra/repos/index.js";
+import { BcryptPasswordHasher } from "@infra/services/hash-service.js";
+import { CreateUserDTO, DeleteUserDTO, GetUserByIdDTO, GetUserDTO, LoginUserDTO, UpdateUserDTO } from "@app/DTOs/index.js";
 import { UserAlreadyExistsError, UserNotFoundError } from "@forit/domain";
 import { createUser, deleteUser, getUserById, getUsers, updateUser } from "@app/use-cases/index.js";
 
@@ -41,30 +42,30 @@ export const createUserController = async (req: Request, res: Response) => {
   }
 };
 
-// export const loginUserController = async (req: Request, res: Response) => {
-//   const dto: CreateUserDTO = req.body;
+export const loginUserController = async (req: Request, res: Response) => {
+  const dto: LoginUserDTO = req.body;
 
-//   try {
-//     const user = await createUser(
-//       {
-//         userRepository,
-//       },
-//       dto,
-//     );
+  try {
+    const user = await loginUser(
+      {
+        userRepository,
+      },
+      dto,
+    );
 
-//     res.status(201).json(user);
-//   } catch (error: any) {
-//     console.error(error);
-//     if (error instanceof UserAlreadyExistsError) {
-//       return res.status(409).json({ message: "User already exists" });
-//     }
+    res.status(201).json(user);
+  } catch (error: any) {
+    console.error(error);
+    if (error instanceof UserAlreadyExistsError) {
+      return res.status(409).json({ message: "User already exists" });
+    }
 
-//     // 🔥 después podés mejorar esto con error handling centralizado
-//     res.status(500).json({
-//       message: "Error creating user",
-//     });
-//   }
-// };
+    // 🔥 después podés mejorar esto con error handling centralizado
+    res.status(500).json({
+      message: "Error creating user",
+    });
+  }
+};
 
 export const getUserController = async (req: Request, res: Response) => {
   const dto: GetUserDTO = {};

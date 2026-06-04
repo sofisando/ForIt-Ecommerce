@@ -1,9 +1,9 @@
 
-import { AuthenticationRepo, Password, PasswordHash, PasswordReuseError, UserNotFoundError, UserRepository } from "@forit/domain";
+import { PasswordHasher, IncorrectPasswordError, Password, PasswordHash, PasswordReuseError, UserNotFoundError, UserRepository } from "@forit/domain";
 
 interface ChangePasswordDeps {
   userRepository: UserRepository;
-  passwordHasher: AuthenticationRepo;
+  passwordHasher: PasswordHasher;
 }
 
 type ChangePasswordPayload = {
@@ -27,7 +27,7 @@ export async function changePassword(
     user.passwordHash.getValue(),
   );
   if (!isCurrentPasswordValid) {
-    throw new Error("Current password is incorrect"); //poner el error desde el domain
+    throw new IncorrectPasswordError()
   }
   //verificar que la nueva contraseña no sea igual a la actual
   const isSamePassword = await passwordHasher.compare(
