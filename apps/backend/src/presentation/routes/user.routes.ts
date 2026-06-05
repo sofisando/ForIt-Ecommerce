@@ -12,9 +12,10 @@ router.post("/register", createUserController);
 router.post("/login", loginUserController);
 router.post("/logout", logoutUserController);
 
-router.get("/", getUserController);
-router.get("/getById/:id", getUserByIdController);
+//protegidas
+router.get("/", authMiddleware, getUserController);
+router.get("/getById/:id", authMiddleware, getUserByIdController);
 router.delete("/delete/:id", authMiddleware, deleteUserController);
-router.patch("/update/:id", updateUserController);
+router.patch("/update/:id", authMiddleware, updateUserController);
 
 export default router;

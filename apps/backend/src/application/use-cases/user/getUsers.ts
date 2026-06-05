@@ -1,30 +1,28 @@
 import { Prisma } from "@infra/generated/prisma/client.js";
 import { GetUserDTO } from "@app/DTOs/index.js";
-import type { User, UserRepository } from "@forit/domain";
+import { UnauthorizedError, UserRole, type AuthenticatedUser, type User, type UserRepository } from "@forit/domain";
 
 interface GetUsersDeps {
   userRepository: UserRepository;
-  //   userService: UserService;
+}
+
+interface GetUserPayload {
+  actor: AuthenticatedUser;
+  dto: GetUserDTO;
 }
 
 export async function getUsers(
-  {
-    userRepository,
-    // userService
-  }: GetUsersDeps,
-  dto: GetUserDTO,
-) : Promise<User[]> {
-  
-  // const user = await userRepository.getById(dto.userId);
-  // if (!user) throw new UserNotFoundError();
-
-  // if (user.role !== UserRole.ADMIN) {
-  //   throw new UnauthorizedError();
-  // }
+  { userRepository }: GetUsersDeps,
+  { actor, dto }: GetUserPayload,
+): Promise<User[]> {
+  if (actor.role !== UserRole.ADMIN) {
+    throw new UnauthorizedError();
+  }
 
   const filters: Prisma.UserWhereInput = {};
 
-  if (dto.search) { // con esto puedo buscar por nombre del cliente, el resto no
+  if (dto.search) {
+    // con esto puedo buscar por nombre del cliente, el resto no
     filters.name = {
       contains: dto.search,
       mode: "insensitive",

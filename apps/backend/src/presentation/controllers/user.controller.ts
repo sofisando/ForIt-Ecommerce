@@ -11,7 +11,12 @@ import {
   LoginUserDTO,
   UpdateUserDTO,
 } from "@app/DTOs/index.js";
-import { IncorrectPasswordError, UnauthorizedError, UserAlreadyExistsError, UserNotFoundError } from "@forit/domain";
+import {
+  IncorrectPasswordError,
+  UnauthorizedError,
+  UserAlreadyExistsError,
+  UserNotFoundError,
+} from "@forit/domain";
 import {
   createUser,
   deleteUser,
@@ -90,7 +95,22 @@ export const loginUserController = async (req: Request, res: Response) => {
   }
 };
 
+export const logoutUserController = async (req: Request, res: Response) => {
+  res.clearCookie("access_token").status(200).json({
+    message: "Logout successful",
+  });
+};
+
+//---------------------- # protected endpoints # -----------------------------
+
 export const getUserController = async (req: Request, res: Response) => {
+  const actor = req.user;
+
+  if (!actor) {
+    return res.status(401).json({
+      message: "Unauthorized - token not found",
+    });
+  }
   const dto: GetUserDTO = {};
 
   if (typeof req.query.search === "string") {
@@ -103,11 +123,14 @@ export const getUserController = async (req: Request, res: Response) => {
       {
         userRepository,
       },
-      dto,
+      { actor, dto },
     );
 
     res.status(200).json(users);
   } catch (error: unknown) {
+    if (error instanceof UnauthorizedError) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
     console.error(error);
 
     res.status(500).json({
@@ -116,10 +139,14 @@ export const getUserController = async (req: Request, res: Response) => {
   }
 };
 
-export const getUserByIdController = async (
-  req: Request,
-  res: Response,
-) => {
+export const getUserByIdController = async (req: Request, res: Response) => {
+   const actor = req.user;
+
+  if (!actor) {
+    return res.status(401).json({
+      message: "Unauthorized - token not found",
+    });
+  }
   if (!req.params.id) {
     return res.status(400).json({ message: "Id is required" });
   }
@@ -128,10 +155,13 @@ export const getUserByIdController = async (
   };
 
   try {
-    const user = await getUserById({ userRepository }, dto);
+    const user = await getUserById({ userRepository }, {actor, dto});
     res.status(200).json(user);
   } catch (error: any) {
     console.error(error);
+    if (error instanceof UnauthorizedError) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
     if (error instanceof UserNotFoundError) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -142,15 +172,12 @@ export const getUserByIdController = async (
 };
 
 // ver si se puede "borrar" el usuario o desabilitarlo en su defecto, o ver si tienen derecho a borrarlo, que creo que si
-export const deleteUserController = async (
-  req: Request,
-  res: Response,
-) => {
+export const deleteUserController = async (req: Request, res: Response) => {
   const actor = req.user;
 
   if (!actor) {
     return res.status(401).json({
-      message: "Unauthorized",
+      message: "Unauthorized - token not found",
     });
   }
   if (!req.params.id) {
@@ -161,7 +188,7 @@ export const deleteUserController = async (
   };
 
   try {
-    await deleteUser({ userRepository }, { actor,dto });
+    await deleteUser({ userRepository }, { actor, dto });
     res.status(204).send();
   } catch (error: any) {
     console.error(error);
@@ -177,10 +204,14 @@ export const deleteUserController = async (
   }
 };
 
-export const updateUserController = async (
-  req: Request,
-  res: Response,
-) => {
+export const updateUserController = async (req: Request, res: Response) => {
+  const actor = req.user;
+
+  if (!actor) {
+    return res.status(401).json({
+      message: "Unauthorized - token not found",
+    });
+  }
   if (!req.params.id) {
     return res.status(400).json({ message: "Id is required" });
   }
@@ -191,28 +222,19 @@ export const updateUserController = async (
   try {
     const updatedUser = await updateUser(
       { userRepository },
-      { targetUserId, dto },
+      { actor, targetUserId, dto },
     );
     res.status(200).json(updatedUser);
   } catch (error: any) {
     console.error(error);
     if (error instanceof UserNotFoundError) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "Target user not found" });
+    }
+    if (error instanceof UnauthorizedError) {
+      return res.status(403).json({ message: "Unauthorized" });
     }
     res.status(500).json({
       message: "Error updating user",
     });
   }
-};
-
-export const logoutUserController = async (
-  req: Request,
-  res: Response,
-) => {
-  res
-    .clearCookie("access_token")
-    .status(200)
-    .json({
-      message: "Logout successful",
-    });
 };
