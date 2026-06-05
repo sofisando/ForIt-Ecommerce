@@ -1,4 +1,10 @@
-import { UserNotFoundError, type UserRepository } from "@forit/domain";
+import {
+  AuthenticatedUser,
+  UnauthorizedError,
+  UserNotFoundError,
+  UserRole,
+  type UserRepository,
+} from "@forit/domain";
 import { DeleteUserDTO } from "@app/DTOs/index.js";
 
 interface DeleteUserDeps {
@@ -6,18 +12,17 @@ interface DeleteUserDeps {
 }
 
 interface DeleteUserPayload {
-  //   actor: AuthenticatedUser; //viene del midleware
+  actor: AuthenticatedUser;
   dto: DeleteUserDTO;
 }
 
 export async function deleteUser(
   { userRepository }: DeleteUserDeps,
-  { dto }: DeleteUserPayload,
+  { actor, dto }: DeleteUserPayload,
 ): Promise<void> {
-
- //   if (actor.role !== UserRole.ADMIN) {
-  //     throw new UnauthorizedError();
-  //   }
+  if (actor.role !== UserRole.ADMIN) {
+    throw new UnauthorizedError();
+  }
 
   const user = await userRepository.getById(dto.id);
   if (!user) {

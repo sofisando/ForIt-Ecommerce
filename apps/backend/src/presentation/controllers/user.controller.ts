@@ -11,7 +11,7 @@ import {
   LoginUserDTO,
   UpdateUserDTO,
 } from "@app/DTOs/index.js";
-import { UserAlreadyExistsError, UserNotFoundError } from "@forit/domain";
+import { UnauthorizedError, UserAlreadyExistsError, UserNotFoundError } from "@forit/domain";
 import {
   createUser,
   deleteUser,
@@ -26,10 +26,6 @@ const db = prisma;
 const userRepository = new UserRepositoryPrisma(db);
 const passwordHasher = new BcryptPasswordHasher();
 const tokenProvider = new JwtTokenProvider();
-
-interface UserParams {
-  id: string;
-}
 
 export const createUserController = async (req: Request, res: Response) => {
   const dto: CreateUserDTO = req.body;
@@ -71,13 +67,14 @@ export const loginUserController = async (req: Request, res: Response) => {
     );
 
     res
-    .cookie("token", user.token, { 
-      httpOnly: true, //la cookie solo se puede acceder desde el servidor
-      // secure: process.env.NODE_ENV === "production", //la cookie solo se envía en conexiones seguras https
-      // sameSite: "strict", //la cookie solo se envía en solicitudes del mismo dominio
-      maxAge: 1000 * 60 * 60 * 24, //la cookie expira en 1 día
-     })
-    .status(201).json(user);
+      .cookie("access_token", user.token, {
+        httpOnly: true, //la cookie solo se puede acceder desde el servidor
+        // secure: process.env.NODE_ENV === "production", //la cookie solo se envía en conexiones seguras https
+        // sameSite: "strict", //la cookie solo se envía en solicitudes del mismo dominio
+        maxAge: 1000 * 60 * 60 * 24, //la cookie expira en 1 día
+      })
+      .status(201)
+      .json(user);
   } catch (error: any) {
     console.error(error);
     if (error instanceof UserAlreadyExistsError) {
@@ -118,14 +115,14 @@ export const getUserController = async (req: Request, res: Response) => {
 };
 
 export const getUserByIdController = async (
-  req: Request<UserParams>,
+  req: Request,
   res: Response,
 ) => {
   if (!req.params.id) {
     return res.status(400).json({ message: "Id is required" });
   }
   const dto: GetUserByIdDTO = {
-    id: req.params.id,
+    id: String(req.params.id),
   };
 
   try {
@@ -144,21 +141,31 @@ export const getUserByIdController = async (
 
 // ver si se puede "borrar" el usuario o desabilitarlo en su defecto, o ver si tienen derecho a borrarlo, que creo que si
 export const deleteUserController = async (
-  req: Request<UserParams>,
+  req: Request,
   res: Response,
 ) => {
+  const actor = req.user;
+
+  if (!actor) {
+    return res.status(401).json({
+      message: "Unauthorized",
+    });
+  }
   if (!req.params.id) {
     return res.status(400).json({ message: "Id is required" });
   }
   const dto: DeleteUserDTO = {
-    id: req.params.id,
+    id: String(req.params.id),
   };
 
   try {
-    await deleteUser({ userRepository }, { dto });
+    await deleteUser({ userRepository }, { actor,dto });
     res.status(204).send();
   } catch (error: any) {
     console.error(error);
+    if (error instanceof UnauthorizedError) {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
     if (error instanceof UserNotFoundError) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -169,14 +176,14 @@ export const deleteUserController = async (
 };
 
 export const updateUserController = async (
-  req: Request<UserParams>,
+  req: Request,
   res: Response,
 ) => {
   if (!req.params.id) {
     return res.status(400).json({ message: "Id is required" });
   }
 
-  const targetUserId = req.params.id;
+  const targetUserId = String(req.params.id);
   const dto: UpdateUserDTO = req.body;
 
   try {

@@ -33,7 +33,7 @@ export async function loginUser(
     throw new IncorrectPasswordError();
   }
 
-  const token = await tokenProvider.generate(user.id);
+  const token = await tokenProvider.generate(user.id, user.role);
 
   // y luego mandar notificacion por email
 
