@@ -11,7 +11,7 @@ import {
   LoginUserDTO,
   UpdateUserDTO,
 } from "@app/DTOs/index.js";
-import { UnauthorizedError, UserAlreadyExistsError, UserNotFoundError } from "@forit/domain";
+import { IncorrectPasswordError, UnauthorizedError, UserAlreadyExistsError, UserNotFoundError } from "@forit/domain";
 import {
   createUser,
   deleteUser,
@@ -76,14 +76,16 @@ export const loginUserController = async (req: Request, res: Response) => {
       .status(201)
       .json(user);
   } catch (error: any) {
-    console.error(error);
-    if (error instanceof UserAlreadyExistsError) {
-      return res.status(409).json({ message: "User already exists" });
+    if (error instanceof UserNotFoundError) {
+      return res.status(404).json({ message: "User not found" });
     }
+    if (error instanceof IncorrectPasswordError) {
+      return res.status(401).json({ message: "Incorrect password" });
+    }
+    console.error(error);
 
-    // 🔥 después podés mejorar esto con error handling centralizado
     res.status(500).json({
-      message: "Error creating user",
+      message: "Error logging in user",
     });
   }
 };
@@ -201,4 +203,16 @@ export const updateUserController = async (
       message: "Error updating user",
     });
   }
+};
+
+export const logoutUserController = async (
+  req: Request,
+  res: Response,
+) => {
+  res
+    .clearCookie("access_token")
+    .status(200)
+    .json({
+      message: "Logout successful",
+    });
 };
