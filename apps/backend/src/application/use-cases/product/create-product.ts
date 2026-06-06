@@ -1,25 +1,23 @@
-import { Product, UserRole } from "@forit/domain";
-import type { ProductRepository, UserRepository } from "@forit/domain";
-import { UserNotFoundError, UnauthorizedError } from "@forit/domain";
+import { UnauthorizedError, UserRole, type AuthenticatedUser, Product, type ProductRepository, Money } from "@forit/domain";
 import { CreateProductDTO } from "@app/DTOs/index.js";
-import { Money } from "@forit/domain/dist/ValueObjects/Money.js";
 
 interface CreateProductDeps {
   productRepository: ProductRepository;
-  // userRepository: UserRepository;
+}
+
+interface CreateProductsPayload {
+  actor: AuthenticatedUser;
+  dto: CreateProductDTO;
 }
 
 export async function createProduct(
   { productRepository }: CreateProductDeps,
-  dto: CreateProductDTO
+  { actor, dto }: CreateProductsPayload
 ): Promise<Product> {
 
-  // const user = await userRepository.getById(dto.userId);
-  // if (!user) throw new UserNotFoundError();
-
-  // if (user.role !== UserRole.ADMIN) {
-  //   throw new UnauthorizedError();
-  // }
+  if (actor.role !== UserRole.ADMIN) {
+    throw new UnauthorizedError();
+  }
 
   const product = new Product(
     crypto.randomUUID(),

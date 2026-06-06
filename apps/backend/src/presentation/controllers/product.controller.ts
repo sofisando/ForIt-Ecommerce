@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "@infra/prisma/prisma.js";
-import { ProductNotFoundError } from "@forit/domain";
+import { ProductNotFoundError, UnauthorizedError } from "@forit/domain";
 import {
   CreateProductDTO,
   DeleteProductDTO,
@@ -20,11 +20,14 @@ import { ProductRepositoryPrisma } from "@infra/repos/index.js";
 const db = prisma;
 const productRepository = new ProductRepositoryPrisma(db);
 
-interface ProductParams {
-  id: string;
-}
-
 export const createProductController = async (req: Request, res: Response) => {
+  const actor = req.user;
+
+  if (!actor) {
+    return res.status(401).json({
+      message: "Unauthorized - token not found",
+    });
+  }
   const dto: CreateProductDTO = req.body;
 
   try {
@@ -32,11 +35,14 @@ export const createProductController = async (req: Request, res: Response) => {
       {
         productRepository,
       },
-      dto,
+      { actor, dto },
     );
 
     res.status(201).json(product);
   } catch (error: any) {
+    if (error instanceof UnauthorizedError) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
     console.error(error);
 
     // 🔥 después podés mejorar esto con error handling centralizado
@@ -91,12 +97,12 @@ export const getProductsController = async (req: Request, res: Response) => {
   }
 };
 
-export const getProductByIdController = async (req: Request<ProductParams>, res: Response) => {
+export const getProductByIdController = async (req: Request, res: Response) => {
   if (!req.params.id) {
     return res.status(400).json({ message: "Id is required" });
   }
   const dto: GetProductByIdDTO = {
-    id: req.params.id,
+    id: String(req.params.id),
   };
 
   try {
@@ -113,19 +119,29 @@ export const getProductByIdController = async (req: Request<ProductParams>, res:
   }
 };
 
-export const deleteProductController = async (req: Request<ProductParams>, res: Response) => {
+export const deleteProductController = async (req: Request, res: Response) => {
+  const actor = req.user;
+
+  if (!actor) {
+    return res.status(401).json({
+      message: "Unauthorized - token not found",
+    });
+  }
   if (!req.params.id) {
     return res.status(400).json({ message: "Id is required" });
   }
   const dto: DeleteProductDTO = {
-    id: req.params.id,
+    id: String(req.params.id),
   };
 
   try {
-    await deleteProduct({ productRepository }, dto);
+    await deleteProduct({ productRepository }, { actor, dto });
     res.status(204).send();
   } catch (error: any) {
     console.error(error);
+    if (error instanceof UnauthorizedError) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
     if (error instanceof ProductNotFoundError) {
       return res.status(404).json({ message: "Product not found" });
     }
@@ -135,19 +151,32 @@ export const deleteProductController = async (req: Request<ProductParams>, res: 
   }
 };
 
-export const updateProductController = async (req: Request<ProductParams>, res: Response) => {
+export const updateProductController = async (req: Request, res: Response) => {
+  const actor = req.user;
+
+  if (!actor) {
+    return res.status(401).json({
+      message: "Unauthorized - token not found",
+    });
+  }
   if (!req.params.id) {
     return res.status(400).json({ message: "Id is required" });
   }
 
-  const id = req.params.id;
+  const id = String(req.params.id);
   const dto: UpdateProductDTO = req.body;
 
   try {
-    const updatedProduct = await updateProduct({ productRepository }, id, dto);
+    const updatedProduct = await updateProduct(
+      { productRepository },
+      { actor, id, dto },
+    );
     res.status(200).json(updatedProduct);
   } catch (error: any) {
     console.error(error);
+    if (error instanceof UnauthorizedError) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
     if (error instanceof ProductNotFoundError) {
       return res.status(404).json({ message: "Product not found" });
     }

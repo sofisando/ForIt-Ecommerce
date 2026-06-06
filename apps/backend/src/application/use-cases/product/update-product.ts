@@ -1,21 +1,32 @@
 import { UpdateProductDTO } from "@app/DTOs/index.js";
-import { Product, ProductNotFoundError } from "@forit/domain";
+import {
+  AuthenticatedUser,
+  Product,
+  ProductNotFoundError,
+  UnauthorizedError,
+  UserRole,
+} from "@forit/domain";
 import { Money } from "@forit/domain/dist/ValueObjects/Money.js";
 import { ProductRepository } from "@forit/domain";
 
 interface UpdateProductDeps {
   productRepository: ProductRepository;
 }
-
-//ponerle al midleware de la autenticacion
+interface UpdateProductPayload {
+  actor: AuthenticatedUser;
+  id: string;
+  dto: UpdateProductDTO;
+}
 
 export async function updateProduct(
   { productRepository }: UpdateProductDeps,
-  id: string,
-  dto: UpdateProductDTO,
+  { actor, id, dto }: UpdateProductPayload,
 ): Promise<Product> {
-  const product = await productRepository.getById(id);
+  if (actor.role !== UserRole.ADMIN) {
+    throw new UnauthorizedError();
+  }
 
+  const product = await productRepository.getById(id);
   if (!product) {
     throw new ProductNotFoundError();
   }

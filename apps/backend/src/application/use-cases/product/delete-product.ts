@@ -1,27 +1,27 @@
-// import { Product, User, UserRole } from "../../entities";
-// import type { ProductService, UserService } from "../../services";
-import { ProductNotFoundError, type ProductRepository } from "@forit/domain";
+import {
+  AuthenticatedUser,
+  ProductNotFoundError,
+  UnauthorizedError,
+  UserRole,
+  type ProductRepository,
+} from "@forit/domain";
 import { DeleteProductDTO } from "@app/DTOs/index.js";
-
 
 interface DeleteProductDeps {
   productRepository: ProductRepository;
-  //   userService: UserService;
+}
+interface DeleteProductPayload {
+  actor: AuthenticatedUser;
+  dto: DeleteProductDTO;
 }
 
 export async function deleteProduct(
-  {
-    productRepository,
-    // userService
-  }: DeleteProductDeps,
-  dto: DeleteProductDTO,
+  { productRepository }: DeleteProductDeps,
+  { actor, dto }: DeleteProductPayload,
 ): Promise<void> {
-  //   const user = await userService.findById(userId);
-  //   if (!user) return new Error(`User ${userId} not found`);
-
-  //   if (user.role !== UserRole.ADMIN) {
-  //     return new Error(`User is not ${UserRole.ADMIN}`);
-  //   }
+  if (actor.role !== UserRole.ADMIN) {
+    throw new UnauthorizedError();
+  }
 
   const product = await productRepository.getById(dto.id);
   if (!product) {

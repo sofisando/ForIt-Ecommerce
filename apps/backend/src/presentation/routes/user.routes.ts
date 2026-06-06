@@ -3,8 +3,7 @@
 
 import { Router } from "express";
 import { createUserController, deleteUserController, getUserByIdController, getUserController, loginUserController, logoutUserController, updateUserController } from "@presentation/controllers/user.controller.js";
-import { authMiddleware } from "@presentation/controllers/middleware/auth.middleware.js";
-
+import { authMiddleware } from "@presentation/controllers/middleware/index.js";
 
 const router = Router();
 
