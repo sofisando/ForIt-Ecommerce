@@ -20,38 +20,6 @@ import { ProductRepositoryPrisma } from "@infra/repos/index.js";
 const db = prisma;
 const productRepository = new ProductRepositoryPrisma(db);
 
-export const createProductController = async (req: Request, res: Response) => {
-  const actor = req.user;
-
-  if (!actor) {
-    return res.status(401).json({
-      message: "Unauthorized - token not found",
-    });
-  }
-  const dto: CreateProductDTO = req.body;
-
-  try {
-    const product = await createProduct(
-      {
-        productRepository,
-      },
-      { actor, dto },
-    );
-
-    res.status(201).json(product);
-  } catch (error: any) {
-    if (error instanceof UnauthorizedError) {
-      return res.status(401).json({ message: "Unauthorized" });
-    }
-    console.error(error);
-
-    // 🔥 después podés mejorar esto con error handling centralizado
-    res.status(500).json({
-      message: "Error creating product",
-    });
-  }
-};
-
 export const getProductsController = async (req: Request, res: Response) => {
   const dto: GetProductsDTO = {};
 
@@ -115,6 +83,40 @@ export const getProductByIdController = async (req: Request, res: Response) => {
     }
     res.status(500).json({
       message: "Error fetching product",
+    });
+  }
+};
+
+// --------------------------- # protected endpoints # ------------------------------
+
+export const createProductController = async (req: Request, res: Response) => {
+  const actor = req.user;
+
+  if (!actor) {
+    return res.status(401).json({
+      message: "Unauthorized - token not found",
+    });
+  }
+  const dto: CreateProductDTO = req.body;
+
+  try {
+    const product = await createProduct(
+      {
+        productRepository,
+      },
+      { actor, dto },
+    );
+
+    res.status(201).json(product);
+  } catch (error: any) {
+    if (error instanceof UnauthorizedError) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    console.error(error);
+
+    // 🔥 después podés mejorar esto con error handling centralizado
+    res.status(500).json({
+      message: "Error creating product",
     });
   }
 };

@@ -1,8 +1,11 @@
 import { CreateCategoryDTO } from "@app/DTOs/index.js";
 import {
+  AuthenticatedUser,
   Category,
   CategoryAlreadyExistsError,
   CategoryRepository,
+  UnauthorizedError,
+  UserRole,
 } from "@forit/domain";
 
 interface CreateCategoryDeps {
@@ -10,18 +13,17 @@ interface CreateCategoryDeps {
 }
 
 interface CreateCategoryPayload {
-  //   actor: AuthenticatedUser; //viene del midleware
+  actor: AuthenticatedUser;
   dto: CreateCategoryDTO;
 }
 
 export async function createCategory(
   { categoryRepository }: CreateCategoryDeps,
-  { dto }: CreateCategoryPayload,
+  { actor, dto }: CreateCategoryPayload,
 ): Promise<Category> {
-    
-  //   if (actor.role !== UserRole.ADMIN) {
-  //     throw new UnauthorizedError();
-  //   }
+  if (actor.role !== UserRole.ADMIN) {
+    throw new UnauthorizedError();
+  }
 
   const existingCategory = await categoryRepository.findByName(dto.name);
 

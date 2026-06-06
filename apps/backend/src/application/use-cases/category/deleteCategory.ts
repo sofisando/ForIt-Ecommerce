@@ -1,23 +1,27 @@
-import { CategoryNotFoundError, type CategoryRepository } from "@forit/domain";
+import {
+  AuthenticatedUser,
+  CategoryNotFoundError,
+  UnauthorizedError,
+  UserRole,
+  type CategoryRepository,
+} from "@forit/domain";
 import { DeleteCategoryDTO } from "@app/DTOs/index.js";
 
 interface DeleteCategoryDeps {
   categoryRepository: CategoryRepository;
 }
-
 interface DeleteCategoryPayload {
-  //   actor: AuthenticatedUser; //viene del midleware
+  actor: AuthenticatedUser;
   dto: DeleteCategoryDTO;
 }
 
 export async function deleteCategory(
   { categoryRepository }: DeleteCategoryDeps,
-  { dto }: DeleteCategoryPayload,
+  { actor, dto }: DeleteCategoryPayload,
 ): Promise<void> {
-
- //   if (actor.role !== UserRole.ADMIN) {
-  //     throw new UnauthorizedError();
-  //   }
+  if (actor.role !== UserRole.ADMIN) {
+    throw new UnauthorizedError();
+  }
 
   const category = await categoryRepository.getById(dto.id);
   if (!category) {
