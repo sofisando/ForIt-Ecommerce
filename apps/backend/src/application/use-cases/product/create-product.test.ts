@@ -4,7 +4,6 @@ import { createProduct } from "./create-product.js";
 import { MockedProductRepository } from "@infra/repos/mocks/mock-product-repo.js";
 
 describe("createProduct", async () => {
-  //acá no se testea el funcionamiento lo que trae el token o si? o como sería?
   test("should create a new product", async () => {
     const productRepository = new MockedProductRepository([]);
     const result = await createProduct(
