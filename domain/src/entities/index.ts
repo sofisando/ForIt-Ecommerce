@@ -5,3 +5,4 @@ export * from "./order.js";
 export * from "./product.js";
 export * from "./user.js";
 export * from "./variant.js"
+export * from "./mocks/index.js"

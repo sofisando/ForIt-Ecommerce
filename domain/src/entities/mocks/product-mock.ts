@@ -1,14 +1,14 @@
-import type { Product } from "../product.js";
 import { faker } from "@faker-js/faker";
+import { Money } from "../../ValueObjects/Money.js";
+import { Product } from "../product.js";
 
 export function productMock(opts?: Partial<Product>): Product {
-  return {
-    id: crypto.randomUUID(),
-    name: faker.commerce.product(),
-    description: faker.commerce.productDescription(),
-    imageUrl: faker.image.urlLoremFlickr(),
-    price: faker.number.int({ max: 10000, min: 5000 }),
-    categoryId: crypto.randomUUID(),
-    ...opts,
-  };
+  return new Product(
+    opts?.id ?? crypto.randomUUID(),
+    opts?.name ?? faker.commerce.product(),
+    opts?.description ?? faker.commerce.productDescription(),
+    opts?.imageUrl ?? faker.image.urlLoremFlickr(),
+    opts?.price ?? new Money(faker.number.int({ min: 5000, max: 10000 })),
+    opts?.categoryId ?? crypto.randomUUID(),
+  );
 }

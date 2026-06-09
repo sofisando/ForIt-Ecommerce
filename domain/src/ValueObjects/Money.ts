@@ -21,12 +21,15 @@ export class Money {
     return Math.round(value * 100) === value * 100;
   }
 
+  get amount() {
+    return this.value;
+  }
+
   toNumber(): number {
     return this.value;
   }
 
-  add (money: Money): Money{
+  add(money: Money): Money {
     return new Money(this.value + money.toNumber());
   }
-
 }
