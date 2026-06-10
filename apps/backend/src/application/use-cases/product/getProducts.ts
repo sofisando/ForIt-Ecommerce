@@ -19,10 +19,20 @@ export async function getProducts(
   const filters: Prisma.ProductWhereInput = {};
 
   if (dto.search) {
-    filters.name = {
-      contains: dto.search,
-      mode: "insensitive",
-    };
+    filters.OR = [
+      {
+        name: {
+          contains: dto.search,
+          mode: "insensitive",
+        },
+      },
+      {
+        description: {
+          contains: dto.search,
+          mode: "insensitive",
+        },
+      },
+    ];
   }
 
   if (dto.categoryId) {

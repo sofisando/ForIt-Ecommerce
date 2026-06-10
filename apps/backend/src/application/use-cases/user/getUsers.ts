@@ -22,11 +22,20 @@ export async function getUsers(
   const filters: Prisma.UserWhereInput = {};
 
   if (dto.search) {
-    // con esto puedo buscar por nombre del cliente, el resto no
-    filters.name = {
-      contains: dto.search,
-      mode: "insensitive",
-    };
+    filters.OR = [
+      {
+        name: {
+          contains: dto.search,
+          mode: "insensitive",
+        },
+      },
+      {
+        email: {
+          contains: dto.search,
+          mode: "insensitive",
+        },
+      },
+    ];
   }
 
   const users = await userRepository.getAll(filters);
