@@ -14,7 +14,7 @@ export async function getCategories(
 ) {
   const filters: Prisma.CategoryWhereInput = {};
 
-  if (dto.search) { //tengo la sospecha que esto no funiona
+  if (dto.search) {
     filters.name = {
       contains: dto.search,
       mode: "insensitive",
