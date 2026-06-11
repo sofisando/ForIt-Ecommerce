@@ -15,6 +15,10 @@ export class DNI {
     this.value = cleanValue;
   }
 
+  getValue(): string {
+    return this.value;
+  }
+
   toString(): string {
     return this.value;
   }

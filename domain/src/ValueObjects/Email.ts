@@ -5,10 +5,13 @@ export class Email {
     if (!value.includes("@")) {
       throw new Error("Invalid email");
     }
-
-    this.value = value.toLowerCase();
+    this.value = value;
   }
 
+  getValue(): string {
+    return this.value;
+  }
+  
   equals(other: Email): boolean {
     return this.value === other.value;
   }
