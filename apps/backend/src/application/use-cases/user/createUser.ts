@@ -1,7 +1,7 @@
 import { CreateUserDTO } from "@app/DTOs/index.js";
 import {
   type UserRepository,
-  AuthenticationRepo,
+  PasswordHasher,
   DNI,
   Email,
   Password,
@@ -13,7 +13,7 @@ import {
 
 interface CreateUserDeps {
   userRepository: UserRepository;
-  passwordHasher: AuthenticationRepo;
+  passwordHasher: PasswordHasher;
   //despues poner EmailRepository
 }
 
