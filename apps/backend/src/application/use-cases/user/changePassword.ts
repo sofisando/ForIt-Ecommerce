@@ -1,5 +1,6 @@
 
-import { PasswordHasher, IncorrectPasswordError, Password, PasswordHash, PasswordReuseError, UserNotFoundError, UserRepository } from "@forit/domain";
+import { changePasswordDTO } from "@app/DTOs/user.dto.js";
+import { PasswordHasher, IncorrectPasswordError, Password, PasswordHash, PasswordReuseError, UserNotFoundError, UserRepository, AuthenticatedUser } from "@forit/domain";
 
 interface ChangePasswordDeps {
   userRepository: UserRepository;
@@ -8,22 +9,21 @@ interface ChangePasswordDeps {
 
 type ChangePasswordPayload = {
   actor: AuthenticatedUser;
-  currentPassword: string;
-  newPassword: string;
+  dto: changePasswordDTO
 };
 
 export async function changePassword(
   { userRepository, passwordHasher }: ChangePasswordDeps,
-  { actor, currentPassword, newPassword }: ChangePasswordPayload,
+  { actor, dto }: ChangePasswordPayload,
 ) {
-  const user = await userRepository.getById(actor.id);
+  const user = await userRepository.getById(actor.userId);
 
   if (!user) {
-    throw new UserNotFoundError(actor.id);
+    throw new UserNotFoundError(actor.userId);
   }
   //validar contraseña actual
   const isCurrentPasswordValid = await passwordHasher.compare(
-    currentPassword,
+    dto.currentPassword,
     user.passwordHash.getValue(),
   );
   if (!isCurrentPasswordValid) {
@@ -31,7 +31,7 @@ export async function changePassword(
   }
   //verificar que la nueva contraseña no sea igual a la actual
   const isSamePassword = await passwordHasher.compare(
-    newPassword,
+    dto.newPassword,
     user.passwordHash.getValue(),
   );
 
@@ -39,7 +39,7 @@ export async function changePassword(
     throw new PasswordReuseError();
   }
 
-  const passwordVO = new Password(newPassword); //acá valida si esta bien la contraseña, o esto deberia hacerse antes?
+  const passwordVO = new Password(dto.newPassword);
   const hashedNewPassword = await passwordHasher.hash(passwordVO.getValue());
   user.changePassword(new PasswordHash(hashedNewPassword));
 

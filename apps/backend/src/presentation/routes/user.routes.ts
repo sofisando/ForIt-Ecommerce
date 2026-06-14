@@ -2,7 +2,7 @@
 //Este archivo SOLO conecta rutas con controllers
 
 import { Router } from "express";
-import { createUserController, deleteUserController, getUserByIdController, getUserController, loginUserController, logoutUserController, updateUserController } from "@presentation/controllers/user.controller.js";
+import { changePasswordController, createUserController, deleteUserController, getUserByIdController, getUserController, loginUserController, logoutUserController, updateUserController } from "@presentation/controllers/user.controller.js";
 import { authMiddleware } from "@presentation/controllers/middleware/index.js";
 
 const router = Router();
@@ -16,5 +16,6 @@ router.get("/", authMiddleware, getUserController);
 router.get("/getById/:id", authMiddleware, getUserByIdController);
 router.delete("/delete/:id", authMiddleware, deleteUserController);
 router.patch("/update/:id", authMiddleware, updateUserController);
+router.patch("/changePassword", authMiddleware, changePasswordController)
 
 export default router;

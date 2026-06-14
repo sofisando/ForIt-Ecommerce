@@ -46,3 +46,8 @@ export interface LoginResponseDTO {
     role: UserRole;
   };
 }
+
+export interface changePasswordDTO {
+  currentPassword: string;
+  newPassword: string;
+}

@@ -4,6 +4,7 @@ import { prisma } from "@infra/prisma/prisma.js";
 import { UserRepositoryPrisma } from "@infra/repos/index.js";
 import { BcryptPasswordHasher } from "@infra/services/hash-service.js";
 import {
+  changePasswordDTO,
   CreateUserDTO,
   DeleteUserDTO,
   GetUserByIdDTO,
@@ -13,11 +14,13 @@ import {
 } from "@app/DTOs/index.js";
 import {
   IncorrectPasswordError,
+  PasswordReuseError,
   UnauthorizedError,
   UserAlreadyExistsError,
   UserNotFoundError,
 } from "@forit/domain";
 import {
+  changePassword,
   createUser,
   deleteUser,
   getUserById,
@@ -232,6 +235,40 @@ export const updateUserController = async (req: Request, res: Response) => {
     }
     if (error instanceof UnauthorizedError) {
       return res.status(403).json({ message: "Unauthorized" });
+    }
+    res.status(500).json({
+      message: "Error updating user",
+    });
+  }
+};
+
+export const changePasswordController = async (req: Request, res: Response) => {
+  const actor = req.user;
+
+  if (!actor) {
+    return res.status(401).json({
+      message: "Unauthorized - token not found",
+    });
+  }
+
+  const dto: changePasswordDTO = req.body;
+
+  try {
+    const changedPassword = await changePassword(
+      { userRepository, passwordHasher },
+      { actor, dto },
+    );
+    res.status(200).json(changedPassword);
+  } catch (error: any) {
+    console.error(error);
+    if (error instanceof UserNotFoundError) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    if (error instanceof IncorrectPasswordError) {
+      return res.status(401).json({ message: "Incorrect Password" });
+    }
+    if (error instanceof PasswordReuseError) {
+      return res.status(401).json({ message: "Password Reuse" });
     }
     res.status(500).json({
       message: "Error updating user",
