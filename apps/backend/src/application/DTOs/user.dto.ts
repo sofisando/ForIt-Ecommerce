@@ -15,6 +15,10 @@ export interface GetUserByIdDTO {
   id: string;
 }
 
+export interface GetUserByEmailDTO {
+  email: string;
+}
+
 export interface DeleteUserDTO {
   id: string;
 }
