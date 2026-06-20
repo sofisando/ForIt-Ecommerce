@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -17,43 +11,46 @@ enum UserRole {
   ADMIN
   CLIENT
 }
-model User{
-  id   String @id @default(uuid())
-  name String
-  DNI String
-  email String @unique
+
+model User {
+  id       String   @id @default(uuid())
+  name     String
+  DNI      String
+  email    String   @unique
   password String
-  role UserRole
-  // carts Cart[]
+  role     UserRole
+  cart Cart? // un usuario tiene un solo carrito RELACION UNO A UNO
+  orders Order[] //RELACION UNO A MUCHOS
 }
 
-model Category{
-  id   String @id @default(uuid())
-  name String @unique
-  products Product[]
+model Category {
+  id        String     @id @default(uuid())
+  name      String     @unique
+  products  Product[]
   discounts Discount[] @relation("DiscountCategories")
 }
 
-model Product{
-  id   String @id @default(uuid())
-  name String
+model Product {
+  id          String     @id @default(uuid())
+  name        String
   description String
-  imageUrl String
-  price Decimal @db.Decimal(10, 2)
-  categoryId String
-  category Category @relation(fields: [categoryId], references: [id])
-  variants Variant[]
-  discounts Discount[] @relation("DiscountProducts")
-  // cartItems CartItem[]
+  imageUrl    String
+  price       Decimal    @db.Decimal(10, 2)
+  categoryId  String
+  category    Category   @relation(fields: [categoryId], references: [id])
+  variants    Variant[] //puede estar vacia la lista de variantes? sino como abajo los discount que parece que si tiene los vincula
+  discounts   Discount[] @relation("DiscountProducts")
+  cartItems CartItem[]
 }
 
 model Variant {
   id        String  @id @default(uuid())
-  title      String // COLOR, SIZE, MATERIAL
-  name      String      // rojo, s, cuero
-  value     String?     // hex, url, null
+  title     String    // COLOR, SIZE, MATERIAL
+  name      String    // rojo, s, cuero
+  value     String?   // hex, url, null
   productId String
   product   Product @relation(fields: [productId], references: [id])
+
   @@index([title, name])
   @@index([productId])
 }
@@ -63,20 +60,51 @@ enum DiscountType {
   FIXED_AMOUNT
 }
 
-model Discount{
-  id     String  @id @default(uuid())
-  name String
-  type DiscountType
-  value Int
-  active Boolean
-  dateFrom DateTime
-  dateTo DateTime
-
-  products   Product[]   @relation("DiscountProducts")
-  categories Category[]  @relation("DiscountCategories")
+model Discount {
+  id         String       @id @default(uuid())
+  name       String
+  type       DiscountType
+  value      Int
+  active     Boolean
+  dateFrom   DateTime
+  dateTo     DateTime
+  categories Category[]   @relation("DiscountCategories")
+  products   Product[]    @relation("DiscountProducts")
 }
 
-// ponemos los datos que se guardan, como esten o como se representen seria el DTO
+model Cart {
+  id        String     @id @default(uuid())
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id])
+
+  items     CartItem[]
+  createdAt DateTime   @default(now()) //para casos de uso donde pasado un timpo podamos decir: "Todavía tenés productos en tu carrito." o borrar carrito cuando pasa mucho tiempo, pero este último no me pinta 
+  updatedAt DateTime   @updatedAt //cada vez que modificas el carrito se actualiza la fecha de modificación
+}
+
+model CartItem {
+  id        String   @id @default(uuid())
+
+  cartId   String
+  cart     Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+
+  // variantId String?
+  // variant   Variant? @relation(fields: [variantId], references: [id])
+
+  quantity  Int
+
+  //esto significa: Dentro de un mismo carrito un producto sólo puede existir una vez.
+
+  // @@unique([cartId, productId, variantId])
+  @@unique([cartId, productId])
+}
+
+//IMPORTANTE: para agregar la variante al cartItem solo tengo que descomentar la relacion de la variante y agregar al @@unique la varianteId
+
+
 enum OrderState {
   PENDING
   ACEPTED
@@ -86,67 +114,29 @@ enum OrderState {
 }
 
 model Order {
-  id        String      @id @default(uuid())
-  userId    String
-  branchId  String?
-  total     Decimal
-  state     OrderState
-  date      DateTime    @default(now())
-
-  items     OrderItem[]
+  id       String      @id @default(uuid())
+  userId   String
+  user       User @relation(fields: [userId], references: [id])
+  // branchId String?
+  total    Decimal     @db.Decimal(10, 2)
+  state    OrderState
+  date     DateTime    @default(now())
+  items    OrderItem[]
 }
 
+//acá se mantiene el nombre y el precio para hacer un histórico y que concurde con los datos de compra de ese momento
 model OrderItem {
-  id        String   @id @default(uuid())
-  orderId  String
-  order    Order    @relation(fields: [orderId], references: [id])
+  id        String  @id @default(uuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
 
-  productId String
-  name      String
-  price     Decimal
   quantity  Int
-  subtotal  Decimal
-
-  // snapshots embebidos
-  variant   Json?
-  discount  Json?
+  unitPrice     Decimal  @db.Decimal(10, 2)
+ 
+  // acá viene el producto y si existen las variantes y descuentos
+  //el producto viene acá por si en algun momento se borra o algo igual se tiene el historial
+  snapshot   Json
 }
-
-// model Cart {
-//   id        String     @id @default(uuid())
-//   userId    String     @unique
-//   user      User       @relation(fields: [userId], references: [id])
-
-//   items     CartItem[]
-//   createdAt DateTime   @default(now())
-//   updatedAt DateTime   @updatedAt
-// }
-
-// model CartItem {
-//   id        String   @id @default(uuid())
-
-//   cartId   String
-//   cart     Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
-
-//   productId String
-//   product   Product  @relation(fields: [productId], references: [id])
-
-//   variantId String?
-//   variant   Variant? @relation(fields: [variantId], references: [id])
-
-//   quantity  Int
-
-//   @@unique([cartId, productId, variantId])
-// }
-
-
-
-
-
-
-
-
-
 
 // model Stock {
 //   id        String   @id @default(uuid())
@@ -166,4 +156,3 @@ model OrderItem {
 //     (productId IS NULL AND variantId IS NOT NULL)
 //   )
 // }
-
