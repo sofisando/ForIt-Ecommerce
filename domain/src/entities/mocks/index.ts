@@ -1,4 +1,5 @@
 export * from './cart-mock';
+export * from './cartItem-mock'
 export * from './category-mock';
 export * from './discount-mock';
 export * from './order-mock';

@@ -1,4 +1,5 @@
 export * from "./cart.js";
+export * from './cartItem.js'
 export * from "./category.js"
 export * from "./discount.js";
 export * from "./order.js";
