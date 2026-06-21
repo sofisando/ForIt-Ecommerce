@@ -17,7 +17,7 @@ model User {
   name     String
   DNI      String
   email    String   @unique
-  password String
+  passwordHash String
   role     UserRole
   cart Cart? // un usuario tiene un solo carrito RELACION UNO A UNO
   orders Order[] //RELACION UNO A MUCHOS
