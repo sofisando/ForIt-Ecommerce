@@ -10,3 +10,5 @@ export class CategoryNotFoundError extends Error {}
 //password
 export class IncorrectPasswordError extends Error {}
 export class PasswordReuseError extends Error {}
+//cart
+export class CartAlreadyExistsError extends Error{}
