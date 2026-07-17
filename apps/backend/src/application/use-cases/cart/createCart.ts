@@ -1,3 +1,5 @@
+//este caso de uso solo va a crear el carrito, sin items (productos) dentro.
+
 import {
   Cart,
   CartAlreadyExistsError,
@@ -6,7 +8,6 @@ import {
   type AuthenticatedUser,
   type CartRepository,
 } from "@forit/domain";
-import { CreateCartDTO } from "@app/DTOs/index.js";
 
 interface CreateCartDeps {
   cartRepository: CartRepository;
@@ -14,12 +15,11 @@ interface CreateCartDeps {
 
 interface CreateCartPayload {
   actor: AuthenticatedUser;
-  dto: CreateCartDTO;
 }
 
 export async function createCart(
   { cartRepository }: CreateCartDeps,
-  { actor, dto }: CreateCartPayload,
+  { actor }: CreateCartPayload,
 ): Promise<Cart> {
   if (actor.role !== UserRole.CLIENT) {
     throw new UnauthorizedError();
@@ -33,9 +33,9 @@ export async function createCart(
   const cart = new Cart(
     crypto.randomUUID(),
     actor.userId,
-    dto.items,
-    dto.createdAt,
-    dto.updatedAt,
+    [],
+    new Date(), // Se establece la fecha de creación como la fecha actual
+    new Date(), // Se establece la fecha de actualización como la fecha actual
   );
 
   await cartRepository.save(cart);

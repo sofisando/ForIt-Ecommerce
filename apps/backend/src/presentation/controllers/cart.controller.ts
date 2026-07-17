@@ -1,57 +1,43 @@
 import { Request, Response } from "express";
 import { prisma } from "@infra/prisma/prisma.js";
-import { CartAlreadyExistsError, ProductNotFoundError, UnauthorizedError } from "@forit/domain";
-import { CreateCartDTO } from "@app/DTOs/index.js";
+import {
+  CartAlreadyExistsError,
+  UnauthorizedError,
+} from "@forit/domain";
 import { CartRepositoryPrisma } from "@infra/repos/index.js";
-import { createCart } from "@app/use-cases/index.js";
+import { createCart, getCarts } from "@app/use-cases/index.js";
 
 const db = prisma;
 const cartRepository = new CartRepositoryPrisma(db);
 
-// export const getCartsController = async (req: Request, res: Response) => {
-//   const dto: GetCartsDTO = {};
+export const getCartsController = async (req: Request, res: Response) => {
+  const actor = req.user;
 
-//   if (typeof req.query.search === "string") {
-//     dto.search = req.query.search;
-//   }
+  if (!actor) {
+    return res.status(401).json({
+      message: "Unauthorized - token not found",
+    });
+  }
+  try {
+    const carts = await getCarts(
+      {
+        cartRepository,
+      },
+      { actor },
+    );
 
-//   if (typeof req.query.categoryId === "string") {
-//     dto.categoryId = req.query.categoryId;
-//   }
+    res.status(200).json(carts);
+  } catch (error: any) {
+    if (error instanceof UnauthorizedError) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    console.error(error);
 
-//   if (typeof req.query.minPrice === "string") {
-//     const minPrice = Number(req.query.minPrice);
-
-//     if (!Number.isNaN(minPrice)) {
-//       dto.minPrice = minPrice;
-//     }
-//   }
-
-//   if (typeof req.query.maxPrice === "string") {
-//     const maxPrice = Number(req.query.maxPrice);
-
-//     if (!Number.isNaN(maxPrice)) {
-//       dto.maxPrice = maxPrice;
-//     }
-//   }
-
-//   try {
-//     const carts = await getProducts(
-//       {
-//         cartRepository,
-//       },
-//       dto,
-//     );
-
-//     res.status(200).json(carts);
-//   } catch (error: unknown) {
-//     console.error(error);
-
-//     res.status(500).json({
-//       message: "Error fetching carts",
-//     });
-//   }
-// };
+    res.status(500).json({
+      message: "Error fetching carts",
+    });
+  }
+};
 
 // export const getProductByIdController = async (req: Request, res: Response) => {
 //   if (!req.params.id) {
@@ -85,14 +71,13 @@ export const createCartController = async (req: Request, res: Response) => {
       message: "Unauthorized - token not found",
     });
   }
-  const dto: CreateCartDTO = req.body;
 
   try {
     const cart = await createCart(
       {
         cartRepository,
       },
-      { actor, dto },
+      { actor },
     );
 
     res.status(201).json(cart);
