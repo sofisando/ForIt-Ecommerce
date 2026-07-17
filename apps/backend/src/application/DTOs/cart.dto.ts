@@ -7,9 +7,7 @@ export interface CreateCartDTO {
   updatedAt: Date;
 }
 
-export interface GetCartsDTO {
-  search?: string;
-}
+// no se hace un getCartsDTO porque no es común filtrar acá, acá se filtraría por productos que tiene un carrito que todavia no se compra... por lo menos ahora no me sirve, depsues puede ser.
 
 export interface GetCartByIdDTO {
   id: string;
