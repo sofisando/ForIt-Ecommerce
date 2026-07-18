@@ -9,8 +9,13 @@ export interface DeleteCartDTO {
   id: string;
 }
 
-export interface getCartByUserId {
+export interface getCartByUserIdDTO {
   userId: string;
 }
 
 // mepa que update de carrito no, sino que se va deleteando los items, agregando o limpiando el carrito y listo
+
+export interface AddItemToCartDTO {
+  productId: string;
+  quantity: number;
+}

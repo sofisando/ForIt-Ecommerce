@@ -2,13 +2,17 @@ import { Request, Response } from "express";
 import { prisma } from "@infra/prisma/prisma.js";
 import {
   CartAlreadyExistsError,
+  CartNotFoundError,
   UnauthorizedError,
 } from "@forit/domain";
 import { CartRepositoryPrisma } from "@infra/repos/index.js";
-import { createCart, getCarts } from "@app/use-cases/index.js";
+import { addItemToCart, createCart, getCarts } from "@app/use-cases/index.js";
+import { AddItemToCartDTO } from "@app/DTOs/cart.dto.js";
 
 const db = prisma;
 const cartRepository = new CartRepositoryPrisma(db);
+
+// --------------------------- # protected endpoints # ------------------------------
 
 export const getCartsController = async (req: Request, res: Response) => {
   const actor = req.user;
@@ -60,8 +64,6 @@ export const getCartsController = async (req: Request, res: Response) => {
 //     });
 //   }
 // };
-
-// --------------------------- # protected endpoints # ------------------------------
 
 export const createCartController = async (req: Request, res: Response) => {
   const actor = req.user;
@@ -129,37 +131,30 @@ export const createCartController = async (req: Request, res: Response) => {
 //   }
 // };
 
-// export const updateProductController = async (req: Request, res: Response) => {
-//   const actor = req.user;
+export const addItemToCartController = async (req: Request, res: Response) => {
+  const actor = req.user;
 
-//   if (!actor) {
-//     return res.status(401).json({
-//       message: "Unauthorized - token not found",
-//     });
-//   }
-//   if (!req.params.id) {
-//     return res.status(400).json({ message: "Id is required" });
-//   }
+  if (!actor) {
+    return res.status(401).json({
+      message: "Unauthorized - token not found",
+    });
+  }
 
-//   const id = String(req.params.id);
-//   const dto: UpdateProductDTO = req.body;
+  const dto: AddItemToCartDTO = req.body;
 
-//   try {
-//     const updatedProduct = await updateProduct(
-//       { cartRepository },
-//       { actor, id, dto },
-//     );
-//     res.status(200).json(updatedProduct);
-//   } catch (error: any) {
-//     console.error(error);
-//     if (error instanceof UnauthorizedError) {
-//       return res.status(401).json({ message: "Unauthorized" });
-//     }
-//     if (error instanceof ProductNotFoundError) {
-//       return res.status(404).json({ message: "Product not found" });
-//     }
-//     res.status(500).json({
-//       message: "Error updating cart",
-//     });
-//   }
-// };
+  try {
+    const updatedCart = await addItemToCart(
+      { cartRepository },
+      { actor, dto },
+    );
+    res.status(200).json(updatedCart);
+  } catch (error: any) {
+    console.error(error);
+    if (error instanceof CartNotFoundError) {
+      return res.status(404).json({ message: "Cart not found" });
+    }
+    res.status(500).json({
+      message: "Error updating cart",
+    });
+  }
+};
