@@ -5,12 +5,14 @@ import {
   CartNotFoundError,
   UnauthorizedError,
 } from "@forit/domain";
-import { CartRepositoryPrisma } from "@infra/repos/index.js";
-import { addItemToCart, createCart, getCarts } from "@app/use-cases/index.js";
+import {
+  cartRepository,
+  productRepository,
+} from "@infra/container/repositories.js";
+import { addItemToCart, createCart, getCartByUserId, getCarts } from "@app/use-cases/index.js";
 import { AddItemToCartDTO } from "@app/DTOs/cart.dto.js";
 
 const db = prisma;
-const cartRepository = new CartRepositoryPrisma(db);
 
 // --------------------------- # protected endpoints # ------------------------------
 
@@ -43,27 +45,28 @@ export const getCartsController = async (req: Request, res: Response) => {
   }
 };
 
-// export const getProductByIdController = async (req: Request, res: Response) => {
-//   if (!req.params.id) {
-//     return res.status(400).json({ message: "Id is required" });
-//   }
-//   const dto: GetProductByIdDTO = {
-//     id: String(req.params.id),
-//   };
+export const getCartByUserIdController = async (req: Request, res: Response) => {
+  const actor = req.user;
 
-//   try {
-//     const cart = await getProductById({ cartRepository }, dto);
-//     res.status(200).json(cart);
-//   } catch (error: any) {
-//     console.error(error);
-//     if (error instanceof ProductNotFoundError) {
-//       return res.status(404).json({ message: "Product not found" });
-//     }
-//     res.status(500).json({
-//       message: "Error fetching cart",
-//     });
-//   }
-// };
+  if (!actor) {
+    return res.status(401).json({
+      message: "Unauthorized - token not found",
+    });
+  }
+
+  try {
+    const cart = await getCartByUserId({ cartRepository, productRepository }, { actor });
+    res.status(200).json(cart);
+  } catch (error: any) {
+    console.error(error);
+    if (error instanceof CartNotFoundError) {
+      return res.status(404).json({ message: "Cart not found" });
+    }
+    res.status(500).json({
+      message: "Error fetching cart",
+    });
+  }
+};
 
 export const createCartController = async (req: Request, res: Response) => {
   const actor = req.user;

@@ -31,7 +31,7 @@ export class Cart extends Entity {
   addItem(item: CartItem): void {
     const existingItem = this._items.find(
       (i) => i.productId === item.productId,
-      // && 
+      // &&
       // i.variantId === item.variantId,
     );
 
@@ -43,19 +43,22 @@ export class Cart extends Entity {
     this._items.push(item);
   }
 
-  removeItem(productId: string): void {
-    this._items = this._items.filter(
-      (item) => item.productId !== productId,
-    );
+  decreaseItemQuantity(productId: string, amount: number): void {
+    const item = this._items.find((i) => i.productId === productId);
+
+    if (!item) {
+      throw new Error("Item not found");
+    }
+
+    item.decreaseQuantity(amount);
   }
 
-  changeItemQuantity(
-    productId: string,
-    quantity: number,
-  ): void {
-    const item = this._items.find(
-      (item) => item.productId === productId,
-    );
+  removeItem(productId: string): void {
+    this._items = this._items.filter((item) => item.productId !== productId);
+  }
+
+  changeItemQuantity(productId: string, quantity: number): void {
+    const item = this._items.find((item) => item.productId === productId);
 
     if (!item) {
       throw new Error("Item not found in cart");
@@ -69,15 +72,10 @@ export class Cart extends Entity {
   }
 
   hasProduct(productId: string): boolean {
-    return this._items.some(
-      (item) => item.productId === productId,
-    );
+    return this._items.some((item) => item.productId === productId);
   }
 
   get totalItems(): number {
-    return this._items.reduce(
-      (total, item) => total + item.quantity,
-      0,
-    );
+    return this._items.reduce((total, item) => total + item.quantity, 0);
   }
 }

@@ -12,7 +12,7 @@ export class UserMapper {
       prismaUser.name,
       new DNI(prismaUser.DNI),
       new Email(prismaUser.email),
-      new PasswordHash(prismaUser.password),
+      new PasswordHash(prismaUser.passwordHash),
       prismaUser.role,
     );
   }
@@ -23,7 +23,7 @@ export class UserMapper {
       name: user.name,
       DNI: user.DNI.toString(),
       email: user.email.toString(),
-      password: user.passwordHash.toString(),
+      passwordHash: user.passwordHash.toString(),
       role: user.role,
     };
   }

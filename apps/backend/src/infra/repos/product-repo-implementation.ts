@@ -1,11 +1,12 @@
 import { PrismaClient } from "@infra/generated/prisma/client.js";
 import { Product, ProductRepository } from "@forit/domain";
-import { ProductMapper } from '@infra/mappers/index.js';
+import { ProductMapper } from "@infra/mappers/index.js";
 
 export class ProductRepositoryPrisma implements ProductRepository {
   private db: PrismaClient;
 
-  constructor(db: PrismaClient) { //acá va el tipo de PrismaClient
+  constructor(db: PrismaClient) {
+    //acá va el tipo de PrismaClient
     this.db = db;
   }
 
@@ -17,6 +18,18 @@ export class ProductRepositoryPrisma implements ProductRepository {
     if (!result) return null;
 
     return ProductMapper.toDomain(result);
+  }
+
+  async getByIds(ids: string[]): Promise<Product[]> {
+    const results = await this.db.product.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
+
+    return results.map(ProductMapper.toDomain);
   }
 
   async getAll(filters: any): Promise<Product[]> {
@@ -42,5 +55,4 @@ export class ProductRepositoryPrisma implements ProductRepository {
       where: { id },
     });
   }
-
 }
