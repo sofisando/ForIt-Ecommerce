@@ -1,6 +1,6 @@
 import { type User, UserRole } from "../../entities";
 import type { Stock } from "../../entities/stock";
-import type { StockService, UserService } from "../../services";
+import type { StockService, UserService } from "../../repos";
 import type { StockIdSelector } from "../../utils/types/stockIdSelector";
 
 interface EditStockDeps {

@@ -1,5 +1,5 @@
 import { describe, test, expect} from "vitest";
-import { MockedDiscountService } from "../../services/mocks/mock-discount-service";
+import { MockedDiscountService } from "../../../../apps/backend/src/application/mocks/mock-discount-repo";
 import { discountMock } from "../../entities/mocks/discount-mock";
 import { getDiscountList } from "./get-discount-list";
 

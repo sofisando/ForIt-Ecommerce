@@ -1,5 +1,5 @@
 import { describe, test, expect} from "vitest";
-import { MockedOrderService } from "../../services/mocks/mock-order-service";
+import { MockedOrderService } from "../../../../apps/backend/src/application/mocks/mock-order-repo";
 import { orderMock } from "../../entities/mocks/order-mock";
 import { getOrdersByUserId } from "./get-orders-by-user";
 

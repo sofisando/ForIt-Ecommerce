@@ -1,4 +1,4 @@
-import { DiscountService } from "../../services";
+import { DiscountService } from "../../repos";
 
 interface GetDiscountListDeps {
     discountService: DiscountService;

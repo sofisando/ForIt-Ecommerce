@@ -1,5 +1,5 @@
 import { describe, test, expect} from "vitest";
-import { MockedVariantService } from "../../services/mocks/mock-variant-service";
+import { MockedVariantService } from "../../../../apps/backend/src/application/mocks/mock-variant-repo";
 import { variantMock } from "../../entities/mocks/variant-mock";
 import { getVariantByProduct } from "./get-variant-by-product";
 

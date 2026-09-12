@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
-import { MockedOrderService } from "../../services/mocks/mock-order-service";
-import { MockedEmailService } from "../../services/mocks/mock-email-service";
+import { MockedOrderService } from "../../../../apps/backend/src/application/mocks/mock-order-repo";
+import { MockedEmailService } from "../../../../apps/backend/src/application/mocks/mock-email-service";
 import { notifyNewOrder } from "./notify-new-order";
 import { orderMock } from "../../entities/mocks/order-mock";
 

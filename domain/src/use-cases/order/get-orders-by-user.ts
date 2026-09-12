@@ -1,5 +1,5 @@
 import { Order, User } from "../../entities";
-import { OrderService } from "../../services/order-service";
+import { OrderService } from "../../repos/order-repository";
 
 interface GetOrdersByUserDeps {
   orderService: OrderService;

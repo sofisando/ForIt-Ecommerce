@@ -1,9 +1,9 @@
 import { describe, test, expect } from "vitest";
-import { MockedDiscountService } from "../../services/mocks/mock-discount-service";
+import { MockedDiscountService } from "../../../../apps/backend/src/application/mocks/mock-discount-repo";
 import { discountMock } from "../../entities/mocks/discount-mock";
 import { deleteDiscount } from "./delete-discount";
 import { userMock } from "../../entities/mocks/user-mock";
-import { MockedUserService } from "../../services/mocks/mock-user-service";
+import { MockedUserService } from "../../../../apps/backend/src/application/mocks/mock-user-repo";
 
 describe("deleteDiscount", async () => {
   const userService = new MockedUserService([

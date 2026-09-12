@@ -1,5 +1,5 @@
 import { Order, User } from "../../entities";
-import type { EmailService, OrderService } from "../../services";
+import type { EmailService, OrderService } from "../../repos";
 
 interface NotifyNewOrderDeps {
   emailService: EmailService;

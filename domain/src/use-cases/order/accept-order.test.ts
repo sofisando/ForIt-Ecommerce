@@ -1,15 +1,15 @@
 import { describe, test, expect } from "vitest";
-import { MockedOrderService } from "../../services/mocks/mock-order-service.js";
-import { MockedProductService } from "../../services/mocks/mock-product-service.js";
-import { MockedVariantService } from "../../services/mocks/mock-variant-service.js";
+import { MockedOrderService } from "../../../../apps/backend/src/application/mocks/mock-order-repo.js";
+import { MockedProductService } from "../../../../apps/backend/src/application/mocks/mock-product-repo.js";
+import { MockedVariantService } from "../../../../apps/backend/src/application/mocks/mock-variant-repo.js";
 import { productMock } from "../../entities/mocks/product-mock.js";
 import { variantMock } from "../../entities/mocks/variant-mock.js";
 import { acceptOrder } from "./accept-order.js";
-import { MockedStockService } from "../../services/mocks/mock-stock-service.js";
+import { MockedStockService } from "../../../../apps/backend/src/application/mocks/mock-stock-repo.js";
 import { stockMock } from "../../entities/mocks/stock-mock.js";
 import { orderMock } from "../../entities/mocks/order-mock.js";
-import { MockedEmailService } from "../../services/mocks/mock-email-service.js";
-import { MockedUserService } from "../../services/mocks/mock-user-service.js";
+import { MockedEmailService } from "../../../../apps/backend/src/application/mocks/mock-email-service.js";
+import { MockedUserService } from "../../../../apps/backend/src/application/mocks/mock-user-repo.js";
 import { userMock } from "../../entities/mocks/user-mock.js";
 
 describe("acceptOrder", () => {

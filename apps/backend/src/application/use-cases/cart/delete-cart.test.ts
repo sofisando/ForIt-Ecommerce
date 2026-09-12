@@ -1,7 +1,7 @@
 import { describe, test, expect } from "vitest";
-import { MockedCartService } from "../../services/mocks/mock-cart-service";
-import { cartMock } from "../../entities/mocks/cart-mock";
-import { deleteCart } from "./delete-cart";
+import { MockedCartService } from "../../../../apps/backend/src/application/mocks/mock-cart-repo";
+import { cartMock } from "@forit/domain/src/entities/mocks/cart-mock.js";
+import { deleteCart } from "@forit/domain/src/use-cases/cart/delete-cart.js";
 
 describe("deleteCart", async () => {
   test("Should delete cart", async () => {

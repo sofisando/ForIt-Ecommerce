@@ -1,5 +1,5 @@
 import { Cart } from "../../entities/cart";
-import { CartService } from "../../services/cart-service";
+import { CartService } from "../../repos/cart-repository";
 import { DeletePayload } from "../../utils/types/payload";
 
 interface DeleteCartDeps {

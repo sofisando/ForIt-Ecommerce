@@ -1,5 +1,5 @@
 import { Discount } from "../../entities";
-import { DiscountService } from "../../services";
+import { DiscountService } from "../../repos";
 
 interface GetActiveDiscountsDeps {
   discountService: DiscountService;

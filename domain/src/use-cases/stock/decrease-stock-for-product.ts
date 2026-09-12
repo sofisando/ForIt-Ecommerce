@@ -1,6 +1,6 @@
-import type { StockService } from "../../services/stock-service";
+import type { StockService } from "../../repos/stock-repository";
 import type { Stock } from "../../entities/stock";
-import { ProductService } from "../../services";
+import { ProductService } from "../../repos";
 
 interface DecreaseStockForProductDeps {
   stockService: StockService;

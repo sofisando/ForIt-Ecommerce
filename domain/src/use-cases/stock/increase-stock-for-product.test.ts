@@ -1,7 +1,7 @@
 import { describe, test, expect } from "vitest";
 import { stockMock } from "../../entities/mocks/stock-mock";
 import { increaseStockForProduct } from "./increase-stock-for-product";
-import { MockedStockService } from "../../services/mocks/mock-stock-service";
+import { MockedStockService } from "../../../../apps/backend/src/application/mocks/mock-stock-repo";
 
 describe("increaseStockForProduct", () => {
   test("increases existing stock", async () => {

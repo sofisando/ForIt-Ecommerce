@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
-import { MockedEmailService } from "../../services/mocks/mock-email-service";
-import { MockedUserService } from "../../services/mocks/mock-user-service";
+import { MockedEmailService } from "../../../../apps/backend/src/application/mocks/mock-email-service";
+import { MockedUserService } from "../../../../apps/backend/src/application/mocks/mock-user-repo";
 import { userMock } from "../../entities/mocks/user-mock";
 import { notifyUserRegistration } from "./notify-user-registration";
 

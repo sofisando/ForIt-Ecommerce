@@ -1,8 +1,8 @@
 import { describe, test, expect } from "vitest";
-import { MockedVariantService } from "../../services/mocks/mock-variant-service";
+import { MockedVariantService } from "../../../../apps/backend/src/application/mocks/mock-variant-repo";
 import { variantMock } from "../../entities/mocks/variant-mock";
 import { deleteVariant } from "./delete-variant";
-import { MockedUserService } from "../../services/mocks/mock-user-service";
+import { MockedUserService } from "../../../../apps/backend/src/application/mocks/mock-user-repo";
 import { userMock } from "../../entities/mocks/user-mock";
 
 describe("deleteVariant", async () => {

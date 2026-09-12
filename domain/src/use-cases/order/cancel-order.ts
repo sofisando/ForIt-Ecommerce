@@ -1,11 +1,11 @@
-import type { ProductService } from "../../services/product-service.js";
-import type { VariantService } from "../../services/variant-service.js";
-import type { OrderService } from "../../services/order-service.js";
+import type { ProductService } from "../../repos/product-repository.js";
+import type { VariantService } from "../../repos/variant-repository.js";
+import type { OrderService } from "../../repos/order-repository.js";
 import { Order, OrderState } from "../../entities/order.js";
-import { StockService } from "../../services/stock-service.js";
+import { StockService } from "../../repos/stock-repository.js";
 import { increaseStockForVariant } from "../stock/increase-stock-for-variant.js";
 import { increaseStockForProduct } from "../stock/increase-stock-for-product.js";
-import type { UserService } from "../../services/user-service.js";
+import type { UserService } from "../../repos/user-repository.js";
 import type { EmailService } from "../../services/email-service.js";
 import type { User } from "../../entities/user.js";
 import { notifyCalcelOrder } from "../email/notify-cancel-order.js";

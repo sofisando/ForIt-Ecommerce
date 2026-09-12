@@ -1,6 +1,6 @@
 import type { Discount } from "../../entities/discount.js";
 import { User, UserRole } from "../../entities/user.js";
-import type { DiscountService, UserService } from "../../services/";
+import type { DiscountService, UserService } from "../../repos/index.js";
 import type { CreatePayload } from "../../utils/types/payload.js";
 
 interface CreateDiscountDeps {

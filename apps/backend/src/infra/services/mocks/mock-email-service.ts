@@ -1,4 +1,4 @@
-import type { EmailService } from "../email-service.js";
+import type { EmailService } from "@forit/domain/src/services/email-service.js";
 
 export class MockedEmailService implements EmailService {
   sent: { to: string; subject: string; body: string }[] = [];

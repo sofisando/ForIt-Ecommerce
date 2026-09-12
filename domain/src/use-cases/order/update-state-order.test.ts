@@ -1,11 +1,11 @@
 import { describe, expect, test } from "vitest";
-import { MockedOrderService } from "../../services/mocks/mock-order-service";
+import { MockedOrderService } from "../../../../apps/backend/src/application/mocks/mock-order-repo";
 import { orderMock } from "../../entities/mocks/order-mock";
 import { updateStateOrder } from "./update-state-order";
 import { Order } from "../../entities";
-import { MockedUserService } from "../../services/mocks/mock-user-service";
+import { MockedUserService } from "../../../../apps/backend/src/application/mocks/mock-user-repo";
 import { userMock } from "../../entities/mocks/user-mock";
-import { MockedEmailService } from "../../services/mocks/mock-email-service";
+import { MockedEmailService } from "../../../../apps/backend/src/application/mocks/mock-email-service";
 
 describe("updateStateOrder", async () => {
   const orderService = new MockedOrderService([

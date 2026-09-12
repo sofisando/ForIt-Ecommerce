@@ -1,7 +1,7 @@
-import { Order, OrderState } from "../../entities/order.js";
-import { User } from "../../entities/user.js";
-import { CreatePayload, UpdatePayload } from "../../utils/index.js";
-import { OrderService } from "../order-service.js";
+import { Order, OrderState } from "@forit/domain/src/entities/order.js";
+import { User } from "@forit/domain/src/entities/user.js";
+import { CreatePayload, UpdatePayload } from "@forit/domain/src/utils/index.js";
+import { OrderService } from "@forit/domain/src/repos/order-repository.js";
 
 export class MockedOrderService implements OrderService {
   orders: Order[] = [];

@@ -1,9 +1,9 @@
 import { describe, expect, test } from "vitest";
-import { MockedDiscountService } from "../../services/mocks/mock-discount-service";
+import { MockedDiscountService } from "../../../../apps/backend/src/application/mocks/mock-discount-repo";
 import { discountMock } from "../../entities/mocks/discount-mock";
 import { faker } from "@faker-js/faker";
 import { createDiscount } from "./create-discount";
-import { MockedUserService } from "../../services/mocks/mock-user-service";
+import { MockedUserService } from "../../../../apps/backend/src/application/mocks/mock-user-repo";
 import { userMock } from "../../entities/mocks/user-mock";
 
 describe("createDiscount", async () => {

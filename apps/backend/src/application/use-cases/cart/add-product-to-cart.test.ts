@@ -1,10 +1,10 @@
 import { describe, expect, test } from "vitest";
-import { MockedCartService } from "../../services/mocks/mock-cart-service";
-import { MockedUserService } from "../../services/mocks/mock-user-service";
-import { userMock } from "../../entities/mocks/user-mock";
-import { addProductToCart } from "./add-product-to-cart";
-import { MockedProductService } from "../../services/mocks/mock-product-service";
-import { productMock } from "../../entities/mocks/product-mock";
+import { MockedCartService } from "../../../../apps/backend/src/application/mocks/mock-cart-repo";
+import { MockedUserService } from "../../../../apps/backend/src/application/mocks/mock-user-repo";
+import { userMock } from "@forit/domain/src/entities/mocks/user-mock.js";
+import { addProductToCart } from "@forit/domain/src/use-cases/cart/add-product-to-cart.js";
+import { MockedProductService } from "../../../../apps/backend/src/application/mocks/mock-product-repo";
+import { productMock } from "@forit/domain/src/entities/mocks/product-mock.js";
 
 describe("addProductToCart", async () => {
   const cartService = new MockedCartService([]);
@@ -39,19 +39,7 @@ describe("addProductToCart", async () => {
     expect(cartService.carts[0]).toStrictEqual({
       id: expect.any(String),
       userId: "1",
-      products: [
-        {
-          productId: "productId1",
-          name: "Mouse",
-          categoryId: "category2",
-          price: 900,
-          variantId: "variantId1",
-          discountApplied: undefined,
-          quantity: 4,
-          subtotal: 0,
-        },
-      ],
-      total: 0,
+      items: [{productId: "productId1", variantId: "variantId1", quantity: 4}]
     });
     expect(result).toStrictEqual(cartService.carts[0]);
   });
@@ -71,19 +59,13 @@ describe("addProductToCart", async () => {
     expect(cartService.carts[0]).toStrictEqual({
       id: expect.any(String),
       userId: "1",
-      products: [
+      items: [
         {
           productId: "productId1",
-          name: "Mouse",
-          categoryId: "category2",
-          price: 900,
           variantId: "variantId1",
-          discountApplied: undefined,
-          quantity: 6,
-          subtotal: 0,
+          quantity: 6
         },
-      ],
-      total: 0,
+      ]
     });
     expect(result).toStrictEqual(cartService.carts[0]);
   });
@@ -103,29 +85,18 @@ describe("addProductToCart", async () => {
     expect(cartService.carts[0]).toStrictEqual({
       id: expect.any(String),
       userId: "1",
-      products: [
+      items: [
         {
           productId: "productId1",
-          name: "Mouse",
-          categoryId: "category2",
-          price: 900,
           variantId: "variantId1",
-          discountApplied: undefined,
-          quantity: 6,
-          subtotal: 0,
+          quantity: 6
         },
         {
           productId: "productId2",
-          name: "Phone",
-          categoryId: "category5",
-          price: 84000,
           variantId: "variantId2",
-          discountApplied: undefined,
-          quantity: 1,
-          subtotal: 0,
+          quantity: 1
         },
-      ],
-      total: 0,
+      ]
     });
     expect(result).toStrictEqual(cartService.carts[0]);
   });

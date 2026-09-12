@@ -1,4 +1,4 @@
-import type { Service } from "../utils/types/service";
+import type { Service } from "../utils/types/repository";
 import type { Stock } from "../entities/stock";
 
 export interface StockService extends Service<Stock> {

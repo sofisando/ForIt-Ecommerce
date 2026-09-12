@@ -1,6 +1,6 @@
-import type { Cart } from "../../entities/cart.js";
-import type { CreatePayload } from "../../utils/index.js";
-import type { CartService } from "../cart-service.js";
+import type { Cart } from "@forit/domain/src/entities/cart.js";
+import type { CreatePayload } from "@forit/domain/src/utils/index.js";
+import type { CartService } from "@forit/domain/src/repos/cart-repository.js";
 
 export class MockedCartService implements CartService{
   carts: Cart[] = [];

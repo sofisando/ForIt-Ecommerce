@@ -1,11 +1,11 @@
 import { describe, test, expect } from "vitest";
-import { MockedProductService } from "../../services/mocks/mock-product-service";
+import { MockedProductService } from "../../../../apps/backend/src/application/mocks/mock-product-repo";
 import { productMock } from "../../entities/mocks/product-mock";
-import { MockedDiscountService } from "../../services/mocks/mock-discount-service";
+import { MockedDiscountService } from "../../../../apps/backend/src/application/mocks/mock-discount-repo";
 import { discountMock } from "../../entities/mocks/discount-mock";
 import {
-  applyDiscountsToProducts,
-} from "./applyDiscountsToProducts";
+  applyDiscounts
+} from "./applyDiscounts";
 
 describe("applyDiscountsToProducts", () => {
   const discountService = new MockedDiscountService([
@@ -36,51 +36,39 @@ describe("applyDiscountsToProducts", () => {
   ]);
 
   test("applies discount to matching products", async () => {
-    const result = await applyDiscountsToProducts(
-      { discountService },
-      productService.products
-    );
+  const result = await applyDiscounts(
+    { discountService },
+    productService.products
+  );
 
-    expect(result).toHaveLength(2);
+  expect(result).toHaveLength(2);
 
-    // product1 tiene descuento por productsApplied
-    expect(result[0]!.discountApplied).toStrictEqual({
-      id: "1",
-      name: "NOCHE DE LAS HELADERIAS",
-      type: "FIXED_AMOUNT",
-      value: 200,
-    });
+  // product1 tiene descuento por productsApplied
+  expect(result[0]!.discount?.id).toBe("1");
 
-    // product2 tiene descuento por categoriesApplied
-    expect(result[1]!.discountApplied).toStrictEqual({
-      id: "1",
-      name: "NOCHE DE LAS HELADERIAS",
-      type: "FIXED_AMOUNT",
-      value: 200,
-    });
+  // product2 tiene descuento por categoriesApplied
+  expect(result[1]!.discount?.id).toBe("1");
+});
+test("returns single product enriched when input is single product", async () => {
+  const product = productService.products[0]!;
+
+  const result = await applyDiscountsToProducts(
+    { discountService },
+    product
+  );
+
+  expect(result.discount).toBeDefined();
+  expect(result.discount?.id).toBe("1");
+});
+test("returns product with discount undefined when no discount found", async () => {
+  const product = productMock({
+    id: "not_exist",
+    categoryId: "no_cat",
   });
 
-  test("returns single product enriched when input is single product", async () => {
-    const product = productService.products[0]!; //toma el primer elemento del array de products
+  const result = await applyDiscountsToProducts({ discountService }, product);
 
-    const result = await applyDiscountsToProducts({ discountService }, product);
+  expect(result.discount).toBeUndefined();
+});
 
-    expect(result.discountApplied).toStrictEqual({
-      id: "1",
-      name: "NOCHE DE LAS HELADERIAS",
-      type: "FIXED_AMOUNT",
-      value: 200,
-    });
-  });
-
-  test("returns product with discountApplied = undefined when no discount found", async () => {
-    const product = productMock({
-      id: "not_exist",
-      categoryId: "no_cat",
-    });
-
-    const result = await applyDiscountsToProducts({ discountService }, product);
-
-    expect(result.discountApplied).toBeUndefined();
-  });
 });

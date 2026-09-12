@@ -15,10 +15,9 @@ import {
   getProducts,
   updateProduct,
 } from "@app/use-cases/index.js";
-import { ProductRepositoryPrisma } from "@infra/repos/index.js";
+import { productRepository } from "@infra/container/repositories.js";
 
 const db = prisma;
-const productRepository = new ProductRepositoryPrisma(db);
 
 export const getProductsController = async (req: Request, res: Response) => {
   const dto: GetProductsDTO = {};

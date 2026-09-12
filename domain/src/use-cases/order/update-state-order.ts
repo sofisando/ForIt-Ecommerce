@@ -1,6 +1,6 @@
 import { User, UserRole } from "../../entities";
 import { Order, OrderState } from "../../entities/order";
-import type { EmailService, OrderService, UserService } from "../../services";
+import type { EmailService, OrderService, UserService } from "../../repos";
 import { notifyUpdateStateOrder } from "../email/notify-update-state-order";
 
 interface UpdateStateOrderDeps {

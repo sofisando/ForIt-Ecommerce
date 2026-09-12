@@ -1,6 +1,6 @@
 import { Stock } from "../../entities/stock";
-import { VariantService } from "../../services";
-import type { StockService } from "../../services/stock-service";
+import { VariantService } from "../../repos";
+import type { StockService } from "../../repos/stock-repository";
 
 interface DecreaseStockForVariantDeps {
   stockService: StockService;

@@ -1,6 +1,5 @@
-import { Variant } from "../../entities/variant.js";
-import { CreatePayload, UpdatePayload } from "../../utils/index.js";
-import { VariantService } from "../variant-service.js";
+import { Variant } from "@forit/domain/src/entities/variant.js";
+import { VariantService } from "@forit/domain/src/repos/variant-repository.js";
 
 export class MockedVariantService implements VariantService {
   variants: Variant[] = [];
@@ -15,23 +14,15 @@ export class MockedVariantService implements VariantService {
   findAll = async (): Promise<Variant[]> => {
     return this.variants;
   };
-  editOne = async (data: UpdatePayload<Variant>): Promise<Variant> => {
-    const index = this.variants.findIndex((variant) => variant.id === data.id);
-    if (index === -1) throw Error("Variant not found");
+  async save(variant: Variant): Promise<void> {
+    const index = this.variants.findIndex((v) => v.id === variant.id);
 
-    const edited = { ...this.variants[index], ...data } as Variant;
-    this.variants[index] = edited;
-    return edited;
-  };
-  create = async (data: CreatePayload<Variant>): Promise<Variant> => {
-    const newVariant = {
-      ...data,
-      id: crypto.randomUUID(), //esto simula cuando la db crea el id
-    } satisfies Variant;
-
-    this.variants.push(newVariant);
-    return newVariant;
-  };
+    if (index === -1) {
+      this.variants.push(variant);
+    } else {
+      this.variants[index] = variant;
+    }
+  }
   delete = async (data: { id: String }): Promise<void> => {
     this.variants = this.variants.filter((u) => u.id !== data.id);
   };

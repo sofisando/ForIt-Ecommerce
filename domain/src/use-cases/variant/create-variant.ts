@@ -1,6 +1,6 @@
 import { User, UserRole } from "../../entities/user.js";
 import type { Variant } from "../../entities/variant.js";
-import type { UserService, VariantService } from "../../services";
+import type { UserService, VariantService } from "../../repos/index.js";
 import type { CreatePayload } from "../../utils/types/payload.js";
 
 interface CreateVariantDeps {

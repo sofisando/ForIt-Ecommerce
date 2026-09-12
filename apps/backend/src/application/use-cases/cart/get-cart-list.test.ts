@@ -1,11 +1,11 @@
 import { describe, test, expect } from "vitest";
-import { MockedCartService } from "../../services/mocks/mock-cart-service";
-import { cartMock } from "../../entities/mocks/cart-mock";
-import { getCartList } from "./get-cart-list";
-import { MockedDiscountService } from "../../services/mocks/mock-discount-service";
-import { discountMock } from "../../entities/mocks/discount-mock";
-import { MockedUserService } from "../../services/mocks/mock-user-service";
-import { userMock } from "../../entities/mocks/user-mock";
+import { MockedCartService } from "../../../../apps/backend/src/application/mocks/mock-cart-repo";
+import { cartMock } from "@forit/domain/src/entities/mocks/cart-mock.js";
+import { getCartList } from "@forit/domain/src/use-cases/cart/get-cart-list.js";
+import { MockedDiscountService } from "../../../../apps/backend/src/application/mocks/mock-discount-repo";
+import { discountMock } from "@forit/domain/src/entities/mocks/discount-mock.js";
+import { MockedUserService } from "../../../../apps/backend/src/application/mocks/mock-user-repo";
+import { userMock } from "@forit/domain/src/entities/mocks/user-mock.js";
 
 describe("getCartList", async () => {
   const discountService = new MockedDiscountService([

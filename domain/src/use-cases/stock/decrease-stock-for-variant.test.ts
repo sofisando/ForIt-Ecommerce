@@ -1,8 +1,8 @@
 import { describe, test, expect } from "vitest";
 import { stockMock } from "../../entities/mocks/stock-mock";
-import { MockedStockService } from "../../services/mocks/mock-stock-service";
+import { MockedStockService } from "../../../../apps/backend/src/application/mocks/mock-stock-repo";
 import { decreaseStockForVariant } from "./decrease-stock-for-variant";
-import { MockedVariantService } from "../../services/mocks/mock-variant-service";
+import { MockedVariantService } from "../../../../apps/backend/src/application/mocks/mock-variant-repo";
 import { variantMock } from "../../entities/mocks/variant-mock";
 
 describe("decreaseStockForVariant", () => {

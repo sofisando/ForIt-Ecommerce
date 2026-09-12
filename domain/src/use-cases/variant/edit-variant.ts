@@ -1,6 +1,6 @@
 import { type User, UserRole } from "../../entities";
 import type { Variant } from "../../entities/variant";
-import type { UserService, VariantService } from "../../services";
+import type { UserService, VariantService } from "../../repos";
 import type { UpdatePayload } from "../../utils/types/payload";
 
 interface EditVariantDeps {

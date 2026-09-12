@@ -1,5 +1,5 @@
 import { UserRole, type Discount, type User } from "../../entities";
-import type { DiscountService, UserService } from "../../services";
+import type { DiscountService, UserService } from "../../repos";
 import type { UpdatePayload } from "../../utils/types/payload";
 
 interface EditDiscountDeps {

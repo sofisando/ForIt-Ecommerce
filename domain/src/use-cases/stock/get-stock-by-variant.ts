@@ -1,5 +1,5 @@
 import { Stock } from "../../entities/stock";
-import { StockService } from "../../services/stock-service";
+import { StockService } from "../../repos/stock-repository";
 
 interface GetStockByVariantDeps {
   stockService: StockService;

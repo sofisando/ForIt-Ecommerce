@@ -1,7 +1,7 @@
 import { describe, test, expect } from "vitest";
-import { MockedCartService } from "../../services/mocks/mock-cart-service";
-import { cartMock } from "../../entities/mocks/cart-mock";
-import { clearCart } from "./clear-cart";
+import { MockedCartService } from "../../../../apps/backend/src/application/mocks/mock-cart-repo";
+import { cartMock } from "@forit/domain/src/entities/mocks/cart-mock.js";
+import { clearCart } from "@forit/domain/src/use-cases/cart/clear-cart.js";
 
 describe("clearCart", async () => {
   const cartService = new MockedCartService([
@@ -13,8 +13,7 @@ describe("clearCart", async () => {
     expect(result).toStrictEqual({
       id: expect.any(String),
       userId: "1",
-      products: [],
-      total: 0,
+      items: []
     });
 
     const carts = await cartService.findAll();
@@ -22,8 +21,7 @@ describe("clearCart", async () => {
     expect(carts[0]).toStrictEqual({
       id: expect.any(String),
       userId: "1",
-      products: [],
-      total: 0,
+      items: []
     });
   });
   test("Should throw if cart not found", async () => {

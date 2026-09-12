@@ -2,7 +2,7 @@ import { Cart } from "../../entities/cart.js";
 import { Product } from "../../entities/product.js";
 import { User } from "../../entities/user.js";
 import { Variant } from "../../entities/variant.js";
-import { CartService } from "../../services/cart-service.js";
+import { CartService } from "../../repos/cart-repository.js";
 
 interface RemoveProductFromCartDeps {
   cartService: CartService;
@@ -21,7 +21,7 @@ export async function removeProductFromCart(
   const cart = await cartService.getCartByUserId(userId);
   if (!cart) throw new Error("Cart not found");
 
-  cart.products = cart.products.filter(
+  cart.items = cart.items.filter(
     (p) => !(p.productId === productId && p.variantId === variantId)
   );
   return cartService.save(cart);

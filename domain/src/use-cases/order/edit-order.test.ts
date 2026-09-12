@@ -1,8 +1,8 @@
 import { describe, expect, test } from "vitest";
-import { MockedOrderService } from "../../services/mocks/mock-order-service";
+import { MockedOrderService } from "../../../../apps/backend/src/application/mocks/mock-order-repo";
 import { orderMock } from "../../entities/mocks/order-mock";
 import { editOrder } from "./edit-order";
-import { MockedUserService } from "../../services/mocks/mock-user-service";
+import { MockedUserService } from "../../../../apps/backend/src/application/mocks/mock-user-repo";
 import { userMock } from "../../entities/mocks/user-mock";
 
 describe("editOrder", async () => {

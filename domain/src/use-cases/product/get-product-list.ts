@@ -1,4 +1,4 @@
-import { DiscountService, ProductService } from "../../services";
+import { DiscountService, ProductService } from "../../repos";
 import { applyDiscountsToProducts } from "../../utils/functions/applyDiscountsToProducts";
 
 interface GetProductListDeps {

@@ -1,16 +1,16 @@
 import { describe, test, expect } from "vitest";
-import { MockedOrderService } from "../../services/mocks/mock-order-service.js";
-import { MockedProductService } from "../../services/mocks/mock-product-service.js";
-import { MockedVariantService } from "../../services/mocks/mock-variant-service.js";
+import { MockedOrderService } from "../../../../apps/backend/src/application/mocks/mock-order-repo.js";
+import { MockedProductService } from "../../../../apps/backend/src/application/mocks/mock-product-repo.js";
+import { MockedVariantService } from "../../../../apps/backend/src/application/mocks/mock-variant-repo.js";
 
 import { cartMock } from "../../entities/mocks/cart-mock.js";
 import { productMock } from "../../entities/mocks/product-mock.js";
 
 import { createOrder } from "./create-order.js";
 import { variantMock } from "../../entities/mocks/variant-mock.js";
-import { MockedUserService } from "../../services/mocks/mock-user-service.js";
+import { MockedUserService } from "../../../../apps/backend/src/application/mocks/mock-user-repo.js";
 import { userMock } from "../../entities/mocks/user-mock.js";
-import { MockedEmailService } from "../../services/mocks/mock-email-service.js";
+import { MockedEmailService } from "../../../../apps/backend/src/application/mocks/mock-email-service.js";
 
 describe("createOrder", () => {
   const orderService = new MockedOrderService([]);

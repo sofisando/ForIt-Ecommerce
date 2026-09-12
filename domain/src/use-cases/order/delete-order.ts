@@ -1,6 +1,6 @@
 import { User, UserRole } from "../../entities";
 import { Order } from "../../entities/order";
-import type { OrderService, UserService } from "../../services";
+import type { OrderService, UserService } from "../../repos";
 import { DeletePayload } from "../../utils/types/payload";
 
 interface DeleteOrderDeps {

@@ -1,6 +1,6 @@
 import { Order, User, UserRole } from "../../entities";
-import type { UserService } from "../../services";
-import type { OrderService } from "../../services/order-service";
+import type { UserService } from "../../repos";
+import type { OrderService } from "../../repos/order-repository";
 
 interface GetOrderListDeps {
   orderService: OrderService;

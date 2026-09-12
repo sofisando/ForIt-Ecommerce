@@ -1,7 +1,7 @@
 import { User, UserRole } from "../../entities";
 import { Order } from "../../entities/order";
-import { UserService } from "../../services";
-import { OrderService } from "../../services/order-service";
+import { UserService } from "../../repos";
+import { OrderService } from "../../repos/order-repository";
 import { UpdatePayload } from "../../utils/types/payload";
 
 interface EditOrderDeps {

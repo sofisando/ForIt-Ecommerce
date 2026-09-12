@@ -1,35 +1,24 @@
 import { describe, expect, test } from "vitest";
-import { MockedCartService } from "../../services/mocks/mock-cart-service";
-import { cartMock } from "../../entities/mocks/cart-mock";
-import { updateProductQuantity } from "./update-product-quantity";
+import { MockedCartService } from "../../../../apps/backend/src/application/mocks/mock-cart-repo";
+import { cartMock } from "@forit/domain/src/entities/mocks/cart-mock.js";
+import { updateProductQuantity } from "@forit/domain/src/use-cases/cart/update-product-quantity.js";
 
 describe("updateProductQuantity", async () => {
   const cartService = new MockedCartService([
     cartMock({
       userId: "1",
-      products: [
+      items: [
         {
           productId: "productId1",
-          name: "Laptop",
-          price: 2000,
-          categoryId: "category1",
           variantId: "variantId1",
-          discountApplied: undefined,
-          quantity: 2,
-          subtotal: 0,
+          quantity: 2
         },
         {
           productId: "productId2",
-          name: "Mouse",
-          price: 500,
-          categoryId: "category2",
           variantId: "variantId2",
-          discountApplied: undefined,
-          quantity: 3,
-          subtotal: 0,
+          quantity: 3
         },
-      ],
-      total: 0,
+      ]
     }),
   ]);
 
@@ -48,29 +37,18 @@ describe("updateProductQuantity", async () => {
     expect(cartService.carts[0]).toStrictEqual({
       id: expect.any(String),
       userId: "1",
-      products: [
+      items: [
         {
           productId: "productId1",
-          name: "Laptop",
-          price: 2000,
-          categoryId: "category1",
           variantId: "variantId1",
-          discountApplied: undefined,
-          quantity: 2,
-          subtotal: 0,
+          quantity: 2
         },
         {
           productId: "productId2",
-          name: "Mouse",
-          price: 500,
-          categoryId: "category2",
           variantId: "variantId2",
-          discountApplied: undefined,
-          quantity: 7,
-          subtotal: 0,
+          quantity: 7
         },
-      ],
-      total: 0,
+      ]
     });
     expect(result).toStrictEqual(cartService.carts[0]);
   });

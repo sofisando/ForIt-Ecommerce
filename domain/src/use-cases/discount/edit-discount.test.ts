@@ -1,10 +1,10 @@
 import { describe, expect, test } from "vitest";
-import { MockedDiscountService } from "../../services/mocks/mock-discount-service";
+import { MockedDiscountService } from "../../../../apps/backend/src/application/mocks/mock-discount-repo";
 import { discountMock } from "../../entities/mocks/discount-mock";
 import { faker } from "@faker-js/faker";
 import { editDiscount } from "./edit-discount";
 import { userMock } from "../../entities/mocks/user-mock";
-import { MockedUserService } from "../../services/mocks/mock-user-service";
+import { MockedUserService } from "../../../../apps/backend/src/application/mocks/mock-user-repo";
 
 describe("editDiscount", async () => {
   const DataFrom = faker.date.past();

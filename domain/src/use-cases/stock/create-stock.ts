@@ -1,6 +1,6 @@
 import type { Stock } from "../../entities/stock.js";
 import { User, UserRole } from "../../entities/user.js";
-import type { StockService, UserService } from "../../services";
+import type { StockService, UserService } from "../../repos/index.js";
 import type { CreatePayload } from "../../utils/types/payload.js";
 import type { StockIdSelector } from "../../utils/types/stockIdSelector.js";
 

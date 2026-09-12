@@ -1,6 +1,5 @@
-import type { Stock } from "../../entities/stock";
-import type { StockService } from "../stock-service";
-import type { CreatePayload, UpdatePayload } from "../../utils";
+import type { Stock } from "@forit/domain/src/entities/stock.js";
+import type { StockService } from "@forit/domain/src/repos/stock-repository.js";
 
 export class MockedStockService implements StockService {
   stocks: Stock[] = [];
@@ -17,25 +16,15 @@ export class MockedStockService implements StockService {
     return this.stocks;
   };
 
-  create = async (data: CreatePayload<Stock>): Promise<Stock> => {
-    const newStock = {
-      ...data,
-      id: crypto.randomUUID(),
-    } satisfies Stock;
+  async save(stock: Stock): Promise<void> {
+    const index = this.stocks.findIndex((s) => s.id === stock.id);
 
-    this.stocks.push(newStock);
-    return newStock;
-  };
-
-  editOne = async (data: UpdatePayload<Stock>): Promise<Stock> => {
-    const index = this.stocks.findIndex((s) => s.id === data.id);
-    if (index === -1) throw Error("Stock not found");
-
-    const updated = { ...this.stocks[index], ...data } as Stock;
-    this.stocks[index] = updated;
-
-    return updated;
-  };
+    if (index === -1) {
+      this.stocks.push(stock);
+    } else {
+      this.stocks[index] = stock;
+    }
+  }
 
   delete = async (data: { id: string }): Promise<void> => {
     this.stocks = this.stocks.filter((s) => s.id !== data.id);

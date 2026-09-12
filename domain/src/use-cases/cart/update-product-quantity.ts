@@ -1,6 +1,6 @@
 import { Cart, Product, User } from "../../entities";
 import { Variant } from "../../entities/variant";
-import { CartService } from "../../services";
+import { CartService } from "../../repos";
 
 interface UpdateProductQuantityDeps {
   cartService: CartService;
@@ -19,7 +19,7 @@ export async function updateProductQuantity(
   const cart = await cartService.getCartByUserId(userId);
   if (!cart) throw new Error("Cart not found");
 
-  const product = cart.products.find(
+  const product = cart.items.find(
     (p) => p.productId === productId && p.variantId === variantId
   );
   if (!product) throw new Error("Product not in cart");

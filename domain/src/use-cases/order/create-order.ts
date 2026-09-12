@@ -1,13 +1,13 @@
 import type { Order, ProductInOrder } from "../../entities/order.js";
-import type { ProductService } from "../../services/product-service.js";
-import type { VariantService } from "../../services/variant-service.js";
-import type { OrderService } from "../../services/order-service.js";
+import type { ProductService } from "../../repos/product-repository.js";
+import type { VariantService } from "../../repos/variant-repository.js";
+import type { OrderService } from "../../repos/order-repository.js";
 import { OrderState } from "../../entities/order.js";
 import type { CreatePayload } from "../../utils/index.js";
 import type { Cart } from "../../entities/cart.js";
 import { notifyNewOrder } from "../email/notify-new-order.js";
 import type { EmailService } from "../../services/email-service.js";
-import { UserService } from "../../services/user-service.js";
+import { UserService } from "../../repos/user-repository.js";
 
 interface CreateOrderDeps {
   orderService: OrderService;

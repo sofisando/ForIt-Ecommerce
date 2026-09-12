@@ -1,5 +1,5 @@
 import { Variant } from "../../entities";
-import { VariantService } from "../../services";
+import { VariantService } from "../../repos";
 
 interface GetVariantsByProductDeps {
   variantService: VariantService;

@@ -1,5 +1,5 @@
 import { type User, UserRole, type Variant } from "../../entities";
-import type { UserService, VariantService } from "../../services";
+import type { UserService, VariantService } from "../../repos";
 
 interface GetVariantListDeps {
   variantService: VariantService;
