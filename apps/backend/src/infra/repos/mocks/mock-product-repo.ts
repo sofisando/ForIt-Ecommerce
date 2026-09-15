@@ -28,4 +28,8 @@ export class MockedProductRepository implements ProductRepository {
   async delete(id: string): Promise<void> {
     this.products = this.products.filter((p) => p.id !== id);
   }
+
+  async getByIds(ids: string[]): Promise<Product[]> {
+    return this.products.filter((p) => ids.includes(p.id)); //lo agregue al tun tun, despues verificar
+  }
 }
