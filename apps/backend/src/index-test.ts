@@ -1,4 +1,4 @@
-import { prisma } from './lib/prisma.js'
+import { prisma } from './infra/prisma/prisma.js'
 
 async function main() {
     // acordarse de activar el servicio de postgres antes de ejecutar el test "sudo systemctl start postgresql"

@@ -1,62 +1,21 @@
-import express, { Request, Response } from "express";
-import { prisma } from './lib/prisma.js'
-import { ProductRepositoryPrisma } from  "./repos/product-repo-implementation.js";
-import { CreateProductDTO } from "./use-cases/DTOs/create-product.dto.js";
-import { createProduct } from "./use-cases/create-product.js";
+import express from "express";
+import cookieParser from "cookie-parser";
+import productRoutes from "./presentation/routes/product.routes.js";
+import categoryRoutes from "./presentation/routes/category.routes.js";
+import userRoutes from "./presentation/routes/user.routes.js";
+import cartRoutes from "./presentation/routes/cart.routes.js"
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use(cookieParser());
 
-const db = prisma;
-
-const productRepository = new ProductRepositoryPrisma(db);
-
-app.get("/test", async (req, res) => {
-  console.log("➡️ test");
-
-  const result = await prisma.product.findMany();
-
-  console.log("✅ result:", result);
-
-  res.json(result);
-});
-
-app.post("/createProduct", async (req: Request, res: Response) => {
-  const dto: CreateProductDTO = req.body;
-
-  try {
-    const product = await createProduct(
-      {
-        productRepository,
-        // userRepository,
-      },
-      dto
-    );
-    res.status(201).json(product);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Internal Server Error");
-  }
-});
-
-// app.get("/getProduct/:id", async (req: Request, res: Response) => {
-//   const id = req.params.id;
-
-//   if (!id) return res.status(400).send("Missing data error");
-
-//   const result = await getProvision({
-//     dependencies: {
-//       provisionService,
-//     },
-//     payload: { id },
-//   });
-
-//   console.log(result);
-
-//   res.status(200).send("Todo OK!");
-// });
+// 🔥 registrás rutas
+app.use("/products", productRoutes); //se crea como blueprint
+app.use("/categories", categoryRoutes);
+app.use("/users", userRoutes);
+app.use('/carts', cartRoutes)
 
 app.listen(port, () => {
   console.log(`Servidor backend escuchando en http://localhost:${port}`);

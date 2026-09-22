@@ -1,34 +1,24 @@
 import { faker } from "@faker-js/faker";
-import type { Cart } from "../cart";
-import { DiscountType } from "../discount";
+import { Cart } from "../cart.js";
+import { CartItem } from "../cartItem.js";
+import { cartItemMock } from "./cartItem-mock.js";
 
-export function cartMock(opts?: Partial<Cart>): Cart {
-  const hasVariant = faker.datatype.boolean();
-  const hasDiscount = faker.datatype.boolean();
+interface CartMockOptions {
+  id?: string;
+  userId?: string;
+  items?: CartItem[];
+  createdAt?: Date;
+  updatedAt?: Date;
+}
 
-  return {
-    id: crypto.randomUUID(),
-    userId: faker.string.uuid(),
-    products: [
-      {
-        productId: crypto.randomUUID(),
-        name: faker.commerce.productName(),
-        price: faker.number.int({ max: 10000, min: 5000 }),
-        categoryId: crypto.randomUUID(),
-        variantId: hasVariant ? crypto.randomUUID() : undefined,
-        discountApplied: hasDiscount
-          ? {
-              id: crypto.randomUUID(),
-              name: faker.commerce.productAdjective(),
-              type: faker.helpers.arrayElement(Object.values(DiscountType)),
-              value: faker.number.int({ min: 5, max: 50 }),
-            }
-          : undefined,
-        quantity: faker.number.int({ min: 1, max: 10 }),
-        subtotal: faker.number.int({ min: 0, max: 500 }),
-      },
-    ],
-    total: faker.number.int({ min: 0, max: 1000 }),
-    ...opts,
-  };
+export function cartMock(
+  opts: CartMockOptions = {},
+): Cart {
+  return new Cart(
+    opts.id ?? crypto.randomUUID(),
+    opts.userId ?? faker.string.uuid(),
+    opts.items ?? [cartItemMock()],
+    opts.createdAt ?? faker.date.past(),
+    opts.updatedAt ?? faker.date.recent(),
+  );
 }

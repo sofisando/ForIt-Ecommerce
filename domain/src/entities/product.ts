@@ -1,4 +1,5 @@
 import { Entity } from "../utils/types/entity";
+import { Money } from "../ValueObjects/Money";
 
 export class Product extends Entity {
   constructor(
@@ -6,17 +7,17 @@ export class Product extends Entity {
     private _name: string,
     private _description: string,
     private _imageUrl: string,
-    private _price: number,
+    private _price: Money,
     private _categoryId: string,
     //se utiliza con _ porque sino da conflicto con el getter, para mantener el encapsulamiento se maneja con _
   ) {
     super(id);
 
-    if (_price <= 0) {
-      throw new Error("Product price must be greater than zero");
-    }
+    this.validateName(_name);
+  }
 
-    if (!_name.trim()) {
+  private validateName(name: string): void {
+    if (!name.trim()) {
       throw new Error("Product name is required");
     }
   }
@@ -36,11 +37,21 @@ export class Product extends Entity {
   get categoryId() {
     return this._categoryId;
   }
-
-  changePrice(newPrice: number) {
-    if (newPrice <= 0) {
-      throw new Error("Product price must be greater than zero");
-    }
+  
+  changeName(newName: string): void {
+    this.validateName(newName);
+    this._name = newName;
+  }
+  changeDescription(newDescription: string): void {
+    this._description = newDescription;
+  }
+  changeImageUrl(newImageUrl: string): void {
+    this._imageUrl = newImageUrl;
+  }
+  changePrice(newPrice: Money) {
     this._price = newPrice;
+  }
+  changeCategory(newCategoryId: string): void {
+    this._categoryId = newCategoryId;
   }
 }

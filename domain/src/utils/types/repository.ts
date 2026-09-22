@@ -6,7 +6,7 @@ export interface Repository<TEntity extends Entity>
 
 interface RepositoryQuery<TEntity extends Entity> {
   getById: (id: string) => Promise<TEntity | null>;
-  getAll: () => Promise<TEntity[]>;
+  getAll: (filters: any) => Promise<TEntity[]>;
 }
 
 interface RepositoryStorage<TEntity extends Entity> {
