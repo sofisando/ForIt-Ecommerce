@@ -19,10 +19,39 @@ services:
       retries: 10
       start_period: 5s
 
+  migration:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+      target: builder
+
+    container_name: forit-migration
+
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    command:
+      [
+        "pnpm",
+        "--filter",
+        "backend",
+        "exec",
+        "prisma",
+        "migrate",
+        "deploy",
+        "--schema",
+        "src/infra/prisma/schema.prisma"
+      ]
+
   backend:
     build:
       context: .
       dockerfile: apps/backend/Dockerfile
+      target: production
 
     container_name: forit-backend
     restart: unless-stopped
@@ -36,8 +65,8 @@ services:
       - "3000:3000"
 
     depends_on:
-      postgres:
-        condition: service_healthy
+      migration:
+        condition: service_completed_successfully
 
 volumes:
   postgres_data:
