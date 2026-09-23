@@ -4,17 +4,22 @@ Backend de un sistema de e-commerce desarrollado con **Node.js, TypeScript, Expr
 
 El proyecto está organizado como un **monorepo administrado con pnpm** y contiene el dominio compartido mediante `@forit/domain`.
 
+La infraestructura de desarrollo utiliza **Docker Compose** para ejecutar PostgreSQL, las migraciones de Prisma y el backend de forma reproducible.
+
 ---
 
-## 1. Tecnologías principales
+# 1. Tecnologías principales
 
-* Node.js
+* Node.js 22
 * TypeScript
 * Express
-* PostgreSQL
+* PostgreSQL 17
 * Prisma ORM
 * pnpm
+* Docker
+* Docker Compose
 * JWT para autenticación
+* bcrypt para almacenamiento seguro de contraseñas
 * Clean Architecture
 * Domain-Driven Design (DDD)
 
@@ -109,73 +114,96 @@ Principalmente:
 * PostgreSQL
 * repositorios
 * configuración de persistencia
+* migraciones
+* infraestructura Docker
 
 El cliente de Prisma generado se encuentra bajo:
 
 ```text
-src/infra/generated/prisma
+apps/backend/src/infra/generated/prisma
 ```
 
 ---
 
-# 3. Requisitos
+# 3. Estructura del monorepo
+
+El proyecto utiliza pnpm workspaces.
+
+Una estructura simplificada es:
+
+```text
+ForIt_Ecommerce/
+│
+├── apps/
+│   ├── backend/
+│   │   ├── src/
+│   │   │   ├── application/
+│   │   │   ├── infra/
+│   │   │   ├── presentation/
+│   │   │   └── index.ts
+│   │   ├── Dockerfile
+│   │   ├── package.json
+│   │   ├── prisma.config.ts
+│   │   └── tsconfig.json
+│   │
+│   └── frontend/
+│
+├── domain/
+│   ├── src/
+│   ├── package.json
+│   └── tsconfig.build.json
+│
+├── docker/
+│   └── postgres/
+│       └── init/
+│           └── 01-create-roles.sh
+│
+├── .dev.env
+├── .env
+├── docker-compose.yml
+├── package.json
+├── pnpm-workspace.yaml
+├── pnpm-lock.yaml
+└── tsconfig.json
+```
+
+El dominio compartido utiliza:
+
+```text
+@forit/domain
+```
+
+El backend utiliza aliases como:
+
+```text
+@app/*
+@infra/*
+@presentation/*
+```
+
+Esto permite evitar imports relativos excesivamente largos.
+
+---
+
+# 4. Requisitos
 
 Para ejecutar el proyecto se necesita:
 
 * Node.js
 * pnpm
-* PostgreSQL
+* Docker
+* Docker Compose
 * Git
 
-La versión de Node utilizada durante el desarrollo fue:
+Versiones utilizadas durante el desarrollo:
 
 ```text
 Node.js 22.12.0
-```
-
-La versión de pnpm utilizada fue:
-
-```text
 pnpm 10.34.1
+PostgreSQL 17
 ```
 
-Se recomienda utilizar versiones compatibles con las anteriores para reproducir el entorno.
-
----
-
-# 4. PostgreSQL
-
-El proyecto actualmente **no utiliza Docker Compose para PostgreSQL**.
-
-Por lo tanto, PostgreSQL debe estar instalado y ejecutándose directamente en la máquina.
-
-Antes de iniciar el backend, verificar que PostgreSQL esté levantado.
-
-En Ubuntu, por ejemplo:
-
-```bash
-sudo systemctl status postgresql
-```
-
-Si está detenido:
-
-```bash
-sudo systemctl start postgresql
-```
-
-También puede verificarse utilizando:
-
-```bash
-sudo -u postgres psql
-```
-
-Si se obtiene una consola de PostgreSQL, el servidor está funcionando.
-
-Para salir:
-
-```sql
-\q
-```
+Docker se encarga de ejecutar PostgreSQL y los servicios asociados, por lo que **no es necesario instalar PostgreSQL directamente en la máquina para utilizar el flujo Docker del proyecto**.
 
 ---
 
@@ -203,98 +231,263 @@ Esto instala las dependencias del monorepo y de sus workspaces.
 
 ---
 
-# 6. Configurar las variables de entorno
+# 6. Variables de entorno
 
-Crear el archivo:
+El proyecto utiliza diferentes archivos de entorno según el contexto.
+
+### Desarrollo local
+
+El backend utiliza:
+
+```text
+.dev.env
+```
+
+Este archivo contiene la configuración necesaria para ejecutar el backend directamente desde la máquina, utilizando PostgreSQL local si corresponde.
+
+El script de desarrollo carga este archivo mediante Node.js:
+
+```bash
+node --env-file=../../.dev.env --import tsx --watch --tsconfig tsconfig.json src/index.ts
+```
+
+### Docker Compose
+
+Docker Compose utiliza:
 
 ```text
 .env
 ```
 
-en la ubicación correspondiente al backend.
+Este archivo contiene las variables utilizadas por la infraestructura Docker.
 
-Configurar como mínimo la conexión a PostgreSQL.
+Los archivos de entorno **no deben subirse al repositorio**, ya que pueden contener credenciales y secretos.
 
-Ejemplo:
+Como mínimo, el entorno Docker utiliza variables relacionadas con:
 
-```env
-DATABASE_URL="postgresql://usuario:password@localhost:5432/forit_ecommerce"
+```text
+POSTGRES_USER
+POSTGRES_PASSWORD
+POSTGRES_DB
+
+APP_DB_USER
+APP_DB_PASSWORD
+
+MIGRATOR_DB_USER
+MIGRATOR_DB_PASSWORD
+
+ADMIN_DB_USER
+ADMIN_DB_PASSWORD
+
+DATABASE_URL_APP
+DATABASE_URL_MIGRATOR
+DATABASE_URL_ADMIN
+
+JWT_SECRET
 ```
 
-Si el sistema utiliza variables adicionales para JWT u otros servicios, también deben configurarse.
+Las credenciales reales deben mantenerse fuera del código fuente.
 
 ---
 
-# 7. Prisma
+# 7. PostgreSQL y Docker Compose
+
+El proyecto utiliza **Docker Compose para contenerizar PostgreSQL**.
+
+La arquitectura principal es:
+
+```text
+Docker Compose
+│
+├── postgres
+│   └── PostgreSQL 17
+│
+├── migration
+│   └── Prisma migrate deploy
+│
+└── backend
+    └── Node.js + Express
+```
+
+El flujo de inicio es:
+
+```text
+PostgreSQL
+    │
+    ▼
+Healthcheck
+    │
+    ▼
+Migration
+    │
+    ├── Prisma migrate deploy
+    │
+    ▼
+Migration finalizada correctamente
+    │
+    ▼
+Backend
+```
+
+El backend depende de que las migraciones hayan finalizado correctamente antes de iniciarse.
+
+---
+
+# 8. Roles de PostgreSQL
+
+El proyecto implementa separación de privilegios mediante diferentes roles de PostgreSQL.
+
+La finalidad es evitar que la aplicación utilice una cuenta con permisos administrativos sobre la base de datos.
+
+La separación es:
+
+```text
+forit
+    │
+    └── Bootstrap de PostgreSQL
+
+forit_app
+    │
+    └── Backend
+        SELECT / INSERT / UPDATE / DELETE
+
+forit_migrator
+    │
+    └── Prisma migrations
+        DDL / cambios de esquema
+
+forit_admin
+    │
+    └── Administración
+        Prisma Studio / tareas DBA
+```
+
+### `forit`
+
+Es el usuario utilizado inicialmente por la imagen oficial de PostgreSQL para crear e inicializar la base de datos.
+
+No se utiliza como usuario de ejecución del backend.
+
+### `forit_app`
+
+Es el usuario utilizado por el backend.
+
+Cuenta con permisos orientados a las operaciones necesarias de la aplicación:
+
+```text
+SELECT
+INSERT
+UPDATE
+DELETE
+```
+
+No se utiliza para ejecutar migraciones.
+
+### `forit_migrator`
+
+Es utilizado exclusivamente por Prisma para ejecutar migraciones:
+
+```bash
+prisma migrate deploy
+```
+
+Tiene permisos necesarios para realizar cambios estructurales en el esquema.
+
+### `forit_admin`
+
+Es el usuario destinado a tareas administrativas y de desarrollo.
+
+Tiene permisos amplios sobre los objetos de la base de datos y se utiliza, entre otras herramientas, para Prisma Studio.
+
+No se utiliza como credencial del backend.
+
+La separación permite aplicar el principio de **least privilege**, reduciendo el impacto potencial de un compromiso de la aplicación.
+
+---
+
+# 9. Prisma
 
 Prisma se utiliza como ORM para comunicarse con PostgreSQL.
 
-Antes de ejecutar el backend, asegurarse de que la base de datos esté sincronizada con el esquema del proyecto.
-
-Dependiendo del flujo utilizado en el proyecto, pueden utilizarse comandos como:
-
-```bash
-pnpm prisma generate
-```
-
-y, para aplicar migraciones:
-
-```bash
-pnpm prisma migrate dev
-```
-
-El comando exacto debe comprobarse en los scripts actuales del proyecto.
-
-El cliente generado se encuentra dentro de:
+El esquema se encuentra en:
 
 ```text
-src/infra/generated/prisma
+apps/backend/src/infra/prisma/schema.prisma
 ```
+
+La configuración de Prisma se encuentra en:
+
+```text
+apps/backend/prisma.config.ts
+```
+
+Las migraciones se almacenan en:
+
+```text
+apps/backend/src/infra/prisma/migrations/
+```
+
+El cliente generado se encuentra en:
+
+```text
+apps/backend/src/infra/generated/prisma/
+```
+
+### Generar el cliente
+
+Cuando sea necesario regenerar el cliente:
+
+```bash
+pnpm --filter backend exec prisma generate
+```
+
+### Crear una migración durante desarrollo
+
+Las nuevas modificaciones del esquema se pueden convertir en migraciones mediante:
+
+```bash
+pnpm --filter backend exec prisma migrate dev --name <nombre>
+```
+
+### Aplicar migraciones
+
+En el entorno Docker, las migraciones se ejecutan mediante:
+
+```bash
+prisma migrate deploy
+```
+
+Esto se realiza en el servicio `migration` antes de iniciar el backend.
 
 ---
 
-# 8. Orden para iniciar el sistema
+# 10. Ejecución con Docker Compose
 
-El orden normal de ejecución es:
+Para iniciar la infraestructura principal:
+
+```bash
+docker compose up --build
+```
+
+Esto inicia:
 
 ```text
-1. PostgreSQL
-      ↓
-2. Base de datos disponible
-      ↓
-3. Backend
-      ↓
-4. Cliente HTTP / Postman / navegador
+postgres
+migration
+backend
 ```
 
-Por ejemplo:
+El servicio `migration` es un contenedor de ejecución única.
 
-### Terminal 1 — PostgreSQL
+Una vez que:
 
-```bash
-sudo systemctl start postgresql
+```text
+prisma migrate deploy
 ```
 
-Verificar:
+finaliza correctamente, el contenedor termina y Docker Compose permite iniciar el backend.
 
-```bash
-sudo systemctl status postgresql
-```
-
----
-
-### Terminal 2 — Backend
-
-Desde el proyecto:
-
-```bash
-cd apps/backend
-pnpm run dev
-```
-
-> El comando exacto debe comprobarse en `package.json`. Si el proyecto tiene otro script para desarrollo, utilizar ese script.
-
-Si todo está correctamente configurado, Express debería iniciar el servidor y quedar escuchando en el puerto configurado.
+El backend queda disponible en:
 
 ```text
 http://localhost:3000
@@ -302,44 +495,97 @@ http://localhost:3000
 
 ---
 
-# 9. Endpoints de la API
+# 11. Prisma Studio
 
-Los endpoints exactos deben consultarse en:
+Prisma Studio está configurado como un servicio administrativo opcional.
 
-```text
-src/presentation/
+No se inicia automáticamente con:
+
+```bash
+docker compose up
 ```
 
-especialmente en los archivos relacionados con:
+Para iniciarlo:
 
-```text
-routes
-controllers
+```bash
+docker compose --profile admin up studio
 ```
 
-La estructura esperada es conceptualmente:
+Studio utiliza la conexión correspondiente al usuario:
 
 ```text
-presentation/
-├── controllers/
-├── routes/
-└── middlewares/
+forit_admin
 ```
 
-Para documentar la API, registrar para cada endpoint:
+y queda disponible en:
 
-| Método    | Endpoint          | Autenticación | Descripción       |
-| --------- | ----------------- | ------------- | ----------------- |
-| POST      | `/users/register` | No            | Crear usuario     |
-| POST      | `/users/login`    | No            | Iniciar sesión    |
-| GET       | `/...`            | No/Sí         | Obtener recursos  |
-| GET       | `/.../:id`        | No/Sí         | Obtener recurso   |
-| PUT/PATCH | `/.../:id`        | Sí            | Modificar recurso |
-| DELETE    | `/.../:id`        | Sí            | Eliminar recurso  |
+```text
+http://localhost:5555
+```
+
+El servicio se ejecuta mediante:
+
+```bash
+prisma studio --port 5555 --browser none
+```
+
+El uso de un perfil permite mantener esta herramienta administrativa separada del flujo normal de ejecución.
+
+Para detener Studio:
+
+```bash
+docker compose stop studio
+```
+
+La base de datos PostgreSQL no necesita exponer directamente el puerto `5432` al host para utilizar Prisma Studio.
 
 ---
 
-# 12. Autenticación
+# 12. Seguridad de la base de datos
+
+El proyecto incorpora diferentes medidas orientadas a la seguridad de PostgreSQL:
+
+### Separación de roles
+
+La aplicación, las migraciones y la administración utilizan credenciales diferentes.
+
+```text
+Backend       → forit_app
+Migrations    → forit_migrator
+Administración → forit_admin
+```
+
+### Least privilege
+
+El backend no utiliza una cuenta administrativa.
+
+Sus permisos están limitados a las operaciones necesarias para funcionar.
+
+### Default privileges
+
+PostgreSQL utiliza `ALTER DEFAULT PRIVILEGES` para garantizar que los objetos creados posteriormente por el rol de migraciones puedan recibir automáticamente los permisos correspondientes.
+
+Esto evita tener que otorgar manualmente permisos a cada tabla nueva.
+
+### PostgreSQL no expuesto directamente
+
+El servicio PostgreSQL no necesita publicar:
+
+```text
+5432:5432
+```
+
+al host para que el backend o Prisma Studio funcionen.
+
+Los servicios se comunican mediante la red interna de Docker Compose.
+
+### Credenciales fuera del código
+
+Las contraseñas y secretos se almacenan mediante variables de entorno y no forman parte del código fuente.
+
+---
+
+# 13. Autenticación
 
 El backend utiliza JWT.
 
@@ -386,99 +632,224 @@ Controller
 
 ---
 
-# 16. Estructura del monorepo
+# 14. Endpoints de la API
 
-El proyecto utiliza pnpm workspaces.
-
-Una estructura aproximada es:
+Los endpoints exactos deben consultarse en:
 
 ```text
-ForIt_Ecommerce/
-│
-├── apps/
-│   └── ...
-│
-├── packages/
-│   └── ...
-│
-├── domain/
-│
-├── package.json
-├── pnpm-workspace.yaml
-├── pnpm-lock.yaml
-└── ...
+apps/backend/src/presentation/
 ```
 
-El dominio compartido utiliza:
+especialmente en:
 
 ```text
-@forit/domain
+controllers/
+routes/
 ```
 
-y el código utiliza aliases como:
+Conceptualmente, la API contiene operaciones como:
 
-```text
-@app/*
-@infra/*
-@presentation/*
-```
+| Método    | Endpoint          | Autenticación | Descripción       |
+| --------- | ----------------- | ------------- | ----------------- |
+| POST      | `/users/register` | No            | Crear usuario     |
+| POST      | `/users/login`    | No            | Iniciar sesión    |
+| GET       | `/...`            | No/Sí         | Obtener recursos  |
+| GET       | `/.../:id`        | No/Sí         | Obtener recurso   |
+| PUT/PATCH | `/.../:id`        | Sí            | Modificar recurso |
+| DELETE    | `/.../:id`        | Sí            | Eliminar recurso  |
 
-Esto permite evitar imports relativos excesivamente largos.
+Esta sección debe actualizarse a medida que se incorporen nuevos endpoints.
 
 ---
 
-# 19. Docker
+# 15. Desarrollo local sin Docker
 
-Actualmente el proyecto **no depende de Docker Compose**.
+El backend también puede ejecutarse directamente desde la máquina para desarrollo.
 
-Por lo tanto, para levantar el sistema durante el desarrollo, no se debe hacer uso de:
+El script de desarrollo es:
 
 ```bash
-docker compose up
+pnpm run dev
 ```
 
-porque la infraestructura de PostgreSQL actualmente se ejecuta directamente en la máquina.
+Este comando utiliza `.dev.env` para cargar las variables de entorno correspondientes al entorno local.
 
-Una futura incorporación de Docker Compose podría encapsular PostgreSQL y facilitar la reproducción del entorno, pero no forma parte del flujo actual.
+El flujo es:
+
+```text
+PostgreSQL local
+      │
+      ▼
+.dev.env
+      │
+      ▼
+pnpm run dev
+      │
+      ▼
+Express
+```
+
+Este flujo es independiente del entorno Docker Compose.
 
 ---
 
-# 20. Checklist de funcionamiento
+# 16. Tests
+
+El backend utiliza Vitest.
+
+Para ejecutar los tests:
+
+```bash
+pnpm --filter backend test
+```
+
+También existe un script destinado a pruebas relacionadas con la conexión a la base de datos:
+
+```bash
+pnpm --filter backend run test:db
+```
+
+---
+
+# 17. Scripts principales
+
+Algunos comandos utilizados durante el desarrollo son:
+
+### Instalar dependencias
+
+```bash
+pnpm install
+```
+
+### Ejecutar backend en desarrollo
+
+```bash
+pnpm run dev
+```
+
+### Ejecutar tests
+
+```bash
+pnpm --filter backend test
+```
+
+### Generar cliente Prisma
+
+```bash
+pnpm --filter backend exec prisma generate
+```
+
+### Crear migración
+
+```bash
+pnpm --filter backend exec prisma migrate dev --name <nombre>
+```
+
+### Levantar infraestructura Docker
+
+```bash
+docker compose up --build
+```
+
+### Levantar Prisma Studio
+
+```bash
+docker compose --profile admin up studio
+```
+
+---
+
+# 18. Checklist de funcionamiento
 
 Antes de considerar que el proyecto está correctamente levantado:
 
-* [ ] PostgreSQL está ejecutándose.
-* [ ] Existe la base de datos.
-* [ ] `.env` está configurado.
-* [ ] `pnpm install` terminó correctamente.
-* [ ] Prisma tiene el cliente generado.
-* [ ] Las migraciones/esquema están aplicados.
-* [ ] El backend inicia sin errores.
+* [ ] Las dependencias están instaladas.
+* [ ] Las variables de entorno están configuradas.
+* [ ] Docker está funcionando.
+* [ ] PostgreSQL inicia correctamente.
+* [ ] El healthcheck de PostgreSQL es correcto.
+* [ ] Las migraciones se ejecutan correctamente.
+* [ ] El backend utiliza `forit_app`.
+* [ ] Las migraciones utilizan `forit_migrator`.
+* [ ] El backend inicia después de las migraciones.
 * [ ] El puerto HTTP responde.
-* [ ] Se puede ejecutar al menos una consulta contra PostgreSQL.
 * [ ] Se puede crear o consultar un usuario.
 * [ ] El login genera un JWT.
 * [ ] Un endpoint protegido acepta un JWT válido.
 * [ ] Un endpoint protegido rechaza una petición sin JWT.
-* [ ] Los roles/permisos funcionan según lo esperado.
+* [ ] Los roles y permisos de PostgreSQL funcionan según lo esperado.
+* [ ] Prisma Studio puede iniciarse mediante el perfil `admin`.
+* [ ] Prisma Studio puede acceder a la base de datos mediante `forit_admin`.
 
 ---
 
-# 21. Próximo paso: documentar la API real
+# 19. Flujo completo de infraestructura
 
-También conviene registrar:
+El flujo actual del proyecto puede resumirse de la siguiente manera:
 
-* puerto real
-* nombre de la base de datos
-* variables de entorno
-* scripts reales de `package.json`
-* migraciones necesarias
-* ejemplos de requests
-* ejemplos de respuestas
-* códigos HTTP esperados
-* endpoints públicos
-* endpoints protegidos
-* roles necesarios
-* colección de Postman, si existe
+```text
+                    Docker Compose
+                         │
+            ┌────────────┴────────────┐
+            │                         │
+            ▼                         │
+      PostgreSQL 17                   │
+            │                         │
+            │ healthcheck             │
+            ▼                         │
+      forit_migrator                  │
+            │                         │
+            │ Prisma                  │
+            │ migrate deploy          │
+            ▼                         │
+      Database schema                 │
+            │                         │
+            ▼                         │
+        forit_app                     │
+            │                         │
+            ▼                         │
+         Backend                      │
+            │                         │
+            ▼                         │
+       Express API                    │
+                                      │
+      ┌───────────────────────────────┘
+      │
+      ▼
+ Optional admin profile
+      │
+      ▼
+ Prisma Studio
+      │
+      ▼
+  forit_admin
+```
 
-Esto convertiría el README en una guía completa de instalación y demostración del proyecto.
+Esta arquitectura permite separar claramente:
+
+```text
+Runtime de la aplicación
+        ≠
+Migraciones
+        ≠
+Administración de la base de datos
+```
+
+y proporciona una base para continuar incorporando controles de seguridad, auditoría y automatización mediante CI/CD.
+
+---
+
+# 20. Próximos pasos
+
+Algunas mejoras previstas para el proyecto:
+
+* Documentar todos los endpoints reales de la API.
+* Incorporar ejemplos de requests y responses.
+* Completar la colección de Postman.
+* Incorporar pruebas de integración.
+* Incorporar controles de seguridad en GitHub Actions.
+* Automatizar el proceso de migraciones en CI/CD.
+* Incorporar logging y auditoría de PostgreSQL.
+* Analizar políticas de acceso y Row-Level Security cuando sean necesarias.
+* Preparar el despliegue del backend en un entorno cloud.
+* Documentar la estrategia de backups y recuperación de la base de datos.

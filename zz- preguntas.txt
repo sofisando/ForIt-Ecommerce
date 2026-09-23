@@ -3,14 +3,43 @@ preguntar por las dependencias que se llaman una sola vez... es un estilo, lo te
 los mensajes de error
 
 
+------------  LEVANTAR CONTENEDORES -----------------------
+-----------------------------------------------------------
+Entonces tu rutina normal queda simplemente:
+docker compose up
+
+Y cuando necesitás cambiar manualmente un usuario a ADMIN:
+docker compose --profile admin up studio
+
+Entrás a:
+http://localhost:5555
+
+hacés el cambio y después:
+docker compose stop studio
+(o ctrol + c para parar el proceso)
+
+Sin tocar PostgreSQL, sin tocar el backend y sin exponer 5432.
+
+
+----------- API -----------------
 ---------------------------------
 
 body para crear producto -- endpoint createProduct
+
 {
   "userId": "38475932875",
   "name": "PRODUCTAZO",
   "description": "PEDAZO PRODUCTAZO",
   "imageUrl": "mansaimg",
-  "price": 40000,
-  "categoryId": "1151893f-ee97-43c8-94b8-9632ce6ffdaf"
+  "price": 400.80,
+  "categoryId": "2"
+}
+
+
+CREAR USUARIO
+{
+  "name": "carlitos",
+  "DNI": "12345678",
+  "email": "carlitos@gmail.com",
+  "password": "12345678"
 }

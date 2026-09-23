@@ -9,8 +9,18 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
 
+      APP_DB_USER: ${APP_DB_USER}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD}
+
+      MIGRATOR_DB_USER: ${MIGRATOR_DB_USER}
+      MIGRATOR_DB_PASSWORD: ${MIGRATOR_DB_PASSWORD}
+
+      ADMIN_DB_USER: ${ADMIN_DB_USER}
+      ADMIN_DB_PASSWORD: ${ADMIN_DB_PASSWORD}
+
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
 
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
@@ -28,7 +38,7 @@ services:
     container_name: forit-migration
 
     environment:
-      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_URL: ${DATABASE_URL_MIGRATOR}
 
     depends_on:
       postgres:
@@ -47,6 +57,41 @@ services:
         "src/infra/prisma/schema.prisma"
       ]
 
+  studio:
+    profiles:
+      - admin
+
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+      target: builder
+
+    container_name: forit-studio
+
+    environment:
+      DATABASE_URL: ${DATABASE_URL_ADMIN}
+
+    depends_on:
+      migration:
+        condition: service_completed_successfully
+
+    ports:
+      - "5555:5555"
+
+    command:
+      [
+        "pnpm",
+        "--filter",
+        "backend",
+        "exec",
+        "prisma",
+        "studio",
+        "--port",
+        "5555",
+        "--browser",
+        "none"
+      ]
+
   backend:
     build:
       context: .
@@ -57,7 +102,7 @@ services:
     restart: unless-stopped
 
     environment:
-      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_URL: ${DATABASE_URL_APP}
       JWT_SECRET: ${JWT_SECRET}
       PORT: 3000
 
